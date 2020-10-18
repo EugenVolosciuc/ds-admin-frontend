@@ -1,0 +1,9 @@
+.login-card {
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+.card-title {
+    margin-bottom: 1em;
+    font-weight: 700;
+}

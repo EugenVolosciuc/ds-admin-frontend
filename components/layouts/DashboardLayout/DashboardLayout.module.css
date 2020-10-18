@@ -1,0 +1,39 @@
+.logo {
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-bottom: 0;
+}
+
+.trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.trigger:hover {
+    color: #B26E63;
+}
+
+.header {
+    background-color: #F2EFEB;
+    transition: all 0.3s;
+}
+
+.header-inner {
+    display: flex;
+    justify-content: space-between;
+}
+
+.content {
+    margin-top: 24px;
+    padding: 24px;
+    min-height: 280px;
+    transition: all 0.3s;
+}
+
+.dropdown {
+    padding-right: 24px;
+}
