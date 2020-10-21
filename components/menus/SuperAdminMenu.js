@@ -4,9 +4,11 @@ import {
     DashboardOutlined,
     UserOutlined,
     HomeOutlined,
+    DollarCircleOutlined
 } from '@ant-design/icons'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
+
+import { Link } from 'i18n'
 
 const SuperAdminMenu = () => {
     const router = useRouter()
@@ -21,6 +23,9 @@ const SuperAdminMenu = () => {
             </Menu.Item>
             <Menu.Item key="/app/schools" icon={<HomeOutlined />}>
                 <Link href="/app/schools" as="/app/schools"><a>Schools</a></Link>
+            </Menu.Item>
+            <Menu.Item key="/app/finances" icon={<DollarCircleOutlined />}>
+                <Link href="/app/finances" as="/app/finances"><a>Finances</a></Link>
             </Menu.Item>
         </Menu>
     )

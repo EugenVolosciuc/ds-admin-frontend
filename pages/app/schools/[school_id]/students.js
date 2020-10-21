@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Modal, Button, Table, message } from 'antd'
 import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import useSWR from 'swr'
@@ -11,18 +11,24 @@ import { withAuth } from 'utils/hoc/withAuth'
 import USER_ROLES from 'constants/USER_ROLES'
 import fetcher from 'utils/functions/fetcher'
 import CreateEditUserModal from 'components/modals/CreateEditUserModal'
+import { authContext } from 'utils/hoc/withAuth'
 
-const UsersPage = () => {
+const StudentsPage = () => {
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(15)
     const [sortBy, setSortBy] = useState({})
     const [showCreateUserModal, setShowCreateUserModal] = useState(false)
     const [showUpdateUserModal, setShowUpdateUserModal] = useState(null)
 
+    const { user, userLoading } = useContext(authContext)
+
     const url = '/users'
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
-        filters: {},
+        filters: { 
+            school: user.school,
+            role: USER_ROLES.STUDENT.tag
+        },
         sortBy,
         page,
         perPage
@@ -84,20 +90,7 @@ const UsersPage = () => {
             key: 'phoneNumber',
             sorter: true
         },
-        {
-            title: 'Role',
-            dataIndex: 'role',
-            key: 'role',
-            sorter: true,
-            render: text => <span>{USER_ROLES[text].label}</span>
-        },
-        {
-            title: 'School',
-            dataIndex: 'school',
-            key: 'school',
-            sorter: true,
-            render: school => <span>{school?.name || '-'}</span>
-        },
+        // TODO: add location
         {
             title: 'Created at',
             dataIndex: 'createdAt',
@@ -134,7 +127,7 @@ const UsersPage = () => {
     )
 
     return (
-        <DashboardLayout title="Users" pageHeaderExtra={pageHeaderExtra}>
+        <DashboardLayout title="Students" pageHeaderExtra={pageHeaderExtra}>
             {/* Create User Modal */}
             <CreateEditUserModal visible={showCreateUserModal} onCancel={toggleCreateUserModal} />
             {/* Update User Modal */}
@@ -160,7 +153,7 @@ const UsersPage = () => {
 }
 
 export default withAuth(
-    UsersPage,
+    StudentsPage,
     [
         USER_ROLES.SUPER_ADMIN.tag,
         USER_ROLES.SCHOOL_ADMIN.tag,

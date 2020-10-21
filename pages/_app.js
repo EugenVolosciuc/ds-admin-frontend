@@ -1,4 +1,6 @@
+
 import { ProvideAuth } from 'utils/hoc/withAuth'
+import { appWithTranslation } from 'i18n'
 
 import 'antd/dist/antd.css'
 import 'config/axios'
@@ -12,4 +14,4 @@ const MyApp = ({ Component, pageProps }) => {
 	)
 }
 
-export default MyApp
+export default appWithTranslation(MyApp)
