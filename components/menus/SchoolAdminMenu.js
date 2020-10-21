@@ -2,8 +2,8 @@ import React from 'react'
 import { Menu } from 'antd'
 import {
     DashboardOutlined,
-    UserOutlined,
-    HomeOutlined,
+    TeamOutlined,
+    BookOutlined,
 } from '@ant-design/icons'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -16,11 +16,11 @@ const SuperAdminMenu = () => {
             <Menu.Item key="/app/dashboard" icon={<DashboardOutlined />}>
                 <Link href="/app/dashboard" as="/app/dashboard"><a>Dashboard</a></Link>
             </Menu.Item>
-            <Menu.Item key="/app/users" icon={<UserOutlined />}>
-                <Link href="/app/users" as="/app/users"><a>Users</a></Link>
+            <Menu.Item key="/app/instructors" icon={<TeamOutlined />}>
+                <Link href="/app/instructors" as="/app/instructors"><a>Instructors</a></Link>
             </Menu.Item>
-            <Menu.Item key="/app/schools" icon={<HomeOutlined />}>
-                <Link href="/app/schools" as="/app/schools"><a>Schools</a></Link>
+            <Menu.Item key="/app/students" icon={<BookOutlined />}>
+                <Link href="/app/students" as="/app/students"><a>Students</a></Link>
             </Menu.Item>
         </Menu>
     )

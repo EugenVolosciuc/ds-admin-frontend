@@ -6,7 +6,7 @@ import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout.
 const Dashboard = () => {
 
     return (
-        <DashboardLayout>
+        <DashboardLayout title="Dashboard">
             <div>
                 <p>This page should be auth only</p>
             </div>

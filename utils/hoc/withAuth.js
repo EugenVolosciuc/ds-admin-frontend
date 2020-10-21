@@ -92,7 +92,7 @@ const useProvideAuth = () => {
             const { data } = await axios.post('/users/login', values)
             setUser(data)
             setUserLoading(false)
-            router.push('/dashboard')
+            router.push('/app/dashboard', '/app/dashboard')
         } catch (error) {
             setUserLoading(false)
             console.log(error)

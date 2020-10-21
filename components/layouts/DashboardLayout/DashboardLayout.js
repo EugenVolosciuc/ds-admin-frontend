@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Layout, Menu, Dropdown } from 'antd'
+import { Layout, Menu, Dropdown, PageHeader } from 'antd'
 import {
     MenuUnfoldOutlined,
     MenuFoldOutlined,
@@ -15,7 +15,7 @@ import MainMenu from 'components/menus/MainMenu'
 
 const { Header, Sider, Content } = Layout
 
-const DashboardLayout = ({ children }) => {
+const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
     const [siderIsCollapsed, setSiderIsCollapsed] = useState(false)
 
     const { user, logout } = useContext(authContext)
@@ -61,6 +61,12 @@ const DashboardLayout = ({ children }) => {
                             </Dropdown>
                         </div>
                     </Header>
+                    <PageHeader 
+                        className={styles['page-header']}
+                        style={{ marginLeft: siderIsCollapsed ? 80 : 200 }}
+                        title={title}
+                        extra={pageHeaderExtra}
+                    />
                     <Content
                         style={{ marginLeft: siderIsCollapsed ? 80 : 200 }}
                         className={styles.content}

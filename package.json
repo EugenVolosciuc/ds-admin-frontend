@@ -15,6 +15,7 @@
     "axios": "^0.20.0",
     "babel-plugin-import": "^1.13.1",
     "less": "^3.12.2",
+    "lodash": "^4.17.20",
     "next": "9.5.5",
     "next-cookies": "^2.0.3",
     "next-i18next": "^6.0.3",
