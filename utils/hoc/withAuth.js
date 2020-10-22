@@ -6,7 +6,7 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import cookies from 'next-cookies'
 
-export const authContext = createContext()
+export const authContext = createContext({ user: null, userLoading: false })
 const isBrowser = typeof window !== 'undefined'
 
 export const ProvideAuth = ({ children }) => {

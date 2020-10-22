@@ -53,7 +53,7 @@ const SchoolsPage = () => {
                 setPage(1)
                 break
             case 'filter':
-                console.log("SORTED OR FILTERED")
+                console.log("FILTERED")
         }
     }
 

@@ -9,7 +9,7 @@ import { authContext } from 'utils/hoc/withAuth'
 
 const { Option } = Select
 
-const CreateEditUserModal = ({ visible, onCancel, user }) => {
+const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
     const [isLoading, setIsLoading] = useState(false)
     const isUpdateModal = !!user
 
@@ -20,7 +20,7 @@ const CreateEditUserModal = ({ visible, onCancel, user }) => {
     const handleCreateUser = async values => {
         setIsLoading(true)
         try {
-            await axios.post('/users', values)
+            await axios.post('/users', userRole && !isUpdateModal ? {...values, role: userRole.tag } : values)
             setIsLoading(false)
             onCancel()
             message.success('User created')
@@ -53,14 +53,17 @@ const CreateEditUserModal = ({ visible, onCancel, user }) => {
         role: user.role
     } : {}
 
+    const modalTitle = isUpdateModal ? `Update ${userRole?.label || 'User'}` : `Register ${userRole?.label || 'User'}`
+
     return (
         <Modal
             destroyOnClose
             visible={visible}
-            title={<span className="bold">{isUpdateModal ? 'Update User' : 'Create User'}</span>}
+            title={<span className="bold">{modalTitle}</span>
+            }
             onCancel={() => onCancel()}
             cancelText="Cancel"
-            okText={isUpdateModal ? 'Update User' : 'Create User'}
+            okText={modalTitle}
             okButtonProps={{ loading: isLoading }}
             onOk={() => {
                 form.validateFields()

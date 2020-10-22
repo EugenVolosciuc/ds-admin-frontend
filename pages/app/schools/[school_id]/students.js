@@ -63,7 +63,7 @@ const StudentsPage = () => {
                 setPage(1)
                 break
             case 'filter':
-                console.log("SORTED OR FILTERED")
+                console.log("FILTERED")
         }
     }
 
@@ -129,17 +129,26 @@ const StudentsPage = () => {
 
     const pageHeaderExtra = (
         <Button size="middle" type="primary" onClick={toggleCreateUserModal}>
-            Create User
+            Register Student
         </Button>
     )
 
     return (
         <DashboardLayout title="Students" pageHeaderExtra={pageHeaderExtra}>
             {/* Create User Modal */}
-            <CreateEditUserModal visible={showCreateUserModal} onCancel={toggleCreateUserModal} />
+            <CreateEditUserModal 
+                visible={showCreateUserModal} 
+                onCancel={toggleCreateUserModal} 
+                userRole={USER_ROLES.STUDENT}
+            />
             {/* Update User Modal */}
             {!isNull(showUpdateUserModal) &&
-                <CreateEditUserModal visible={showUpdateUserModal} onCancel={toggleUpdateUserModal} user={data?.users.find(user => user._id === showUpdateUserModal)} />
+                <CreateEditUserModal 
+                    visible={showUpdateUserModal} 
+                    onCancel={toggleUpdateUserModal} 
+                    user={data?.users.find(user => user._id === showUpdateUserModal)}
+                    userRole={USER_ROLES.STUDENT}
+                />
             }
 
             <Table

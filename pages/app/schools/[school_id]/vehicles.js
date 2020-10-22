@@ -100,35 +100,7 @@ const VehiclesPage = () => {
             key: 'transmission',
             sorter: true,
             render: transmission => <span>{transmission ? TRANSMISSION_TYPES[transmission].label : '-'}</span>
-        },
-        // {
-        //     title: 'Email',
-        //     dataIndex: 'email',
-        //     key: 'email',
-        //     sorter: true,
-        //     render: email => <span>{email ? email : '-'}</span>
-        // },
-        // {
-        //     title: 'Phone number',
-        //     dataIndex: 'phoneNumber',
-        //     key: 'phoneNumber',
-        //     sorter: true
-        // },
-        // // TODO: add location
-        // {
-        //     title: 'Role',
-        //     dataIndex: 'role',
-        //     key: 'role',
-        //     sorter: true,
-        //     render: text => <span>{USER_ROLES[text].label}</span>
-        // },
-        // {
-        //     title: 'Created at',
-        //     dataIndex: 'createdAt',
-        //     key: 'createdAt',
-        //     sorter: true,
-        //     render: time => dayjs(time).format('HH:mm DD-MM-YYYY')
-        // }
+        }
     ]
 
     return (
