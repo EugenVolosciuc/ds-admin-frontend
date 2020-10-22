@@ -1,5 +1,3 @@
-// Will probably get the userRole here from the context, if possible
-
 /**
  * Render content if user has specified role
  * @param {*} defaultContent The default content to show

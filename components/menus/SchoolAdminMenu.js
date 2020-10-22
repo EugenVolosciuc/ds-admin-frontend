@@ -29,14 +29,14 @@ const SuperAdminMenu = () => {
             <Menu.Item key="/app/schools/[school_id]/students" icon={<BookOutlined />}>
                 <Link href="/app/schools/[school_id]/students" as={`/app/schools/${user.school}/students`}><a>Students</a></Link>
             </Menu.Item>
-            <Menu.Item key="/app/locations" icon={<PushpinOutlined />}>
-                <Link href="/app/locations" as="/app/locations"><a>School Locations</a></Link>
+            <Menu.Item key="/app/schools/[school_id]/locations" icon={<PushpinOutlined />}>
+                <Link href="/app/schools/[school_id]/locations" as={`/app/schools/${user.school}/locations`}><a>School Locations</a></Link>
+            </Menu.Item>
+            <Menu.Item key="/app/schools/[school_id]/vehicles" icon={<CarOutlined />}>
+                <Link href="/app/schools/[school_id]/vehicles" as={`/app/schools/${user.school}/vehicles`}><a>Vehicles</a></Link>
             </Menu.Item>
             <Menu.Item key="/app/calendar" icon={<CalendarOutlined />}>
                 <Link href="/app/calendar" as="/app/calendar"><a>Calendar</a></Link>
-            </Menu.Item>
-            <Menu.Item key="/app/vehicles" icon={<CarOutlined />}>
-                <Link href="/app/vehicles" as="/app/vehicles"><a>Vehicles</a></Link>
             </Menu.Item>
         </Menu>
     )

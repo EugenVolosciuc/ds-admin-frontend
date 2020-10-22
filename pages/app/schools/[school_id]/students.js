@@ -92,6 +92,13 @@ const StudentsPage = () => {
         },
         // TODO: add location
         {
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
+            sorter: true,
+            render: text => <span>{USER_ROLES[text].label}</span>
+        },
+        {
             title: 'Created at',
             dataIndex: 'createdAt',
             key: 'createdAt',

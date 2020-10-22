@@ -1,9 +1,11 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { Modal, Form, Input, Select, Row, Col, message } from 'antd'
 import axios from 'axios'
 import { mutate } from 'swr'
 
 import USER_ROLES from 'constants/USER_ROLES'
+import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
+import { authContext } from 'utils/hoc/withAuth'
 
 const { Option } = Select
 
@@ -12,6 +14,8 @@ const CreateEditUserModal = ({ visible, onCancel, user }) => {
     const isUpdateModal = !!user
 
     const [form] = Form.useForm()
+
+    const auth = useContext(authContext)
 
     const handleCreateUser = async values => {
         setIsLoading(true)
@@ -47,7 +51,7 @@ const CreateEditUserModal = ({ visible, onCancel, user }) => {
         phoneNumber: user.phoneNumber,
         email: user.email,
         role: user.role
-    } : { }
+    } : {}
 
     return (
         <Modal
@@ -98,17 +102,27 @@ const CreateEditUserModal = ({ visible, onCancel, user }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                <Row>
-                    <Col span={24}>
-                        <Form.Item name="role" label="Role" rules={[{ required: true, message: "Role is required" }]}>
-                            <Select>
-                                {Object.values(USER_ROLES).filter(role => role.tag != USER_ROLES.SUPER_ADMIN.tag).map(role => (
-                                    <Option key={role.tag} value={role.tag}>{role.label}</Option>
-                                ))}
-                            </Select>
-                        </Form.Item>
-                    </Col>
-                </Row>
+                {
+                    renderRoleBasedContent(
+                        null,
+                        {
+                            [USER_ROLES.SUPER_ADMIN.tag]: (
+                                <Row>
+                                    <Col span={24}>
+                                        <Form.Item name="role" label="Role" rules={[{ required: true, message: "Role is required" }]}>
+                                            <Select>
+                                                {Object.values(USER_ROLES).filter(role => role.tag != USER_ROLES.SUPER_ADMIN.tag).map(role => (
+                                                    <Option key={role.tag} value={role.tag}>{role.label}</Option>
+                                                ))}
+                                            </Select>
+                                        </Form.Item>
+                                    </Col>
+                                </Row>
+                            )
+                        },
+                        auth.user.role
+                    )
+                }
             </Form>
         </Modal>
     )
