@@ -154,9 +154,10 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     } : {}
 
     const modalTitle = isUpdateModal ? 'Update vehicle' : 'Register vehicle'
+    const canPutOutOfUse = isUpdateModal && vehicle.status !== VEHICLE_STATUSES.INOPERATIVE.tag
     const modalFooter = (
-        <Row justify={isUpdateModal ? "space-between" : "end"}>
-            {isUpdateModal &&
+        <Row justify={canPutOutOfUse ? "space-between" : "end"}>
+            {canPutOutOfUse &&
                 <Col span={12}>
                     <Row align="middle" justify="start">
                         <Popconfirm title="Are you sure you want to put this vehicle out of use?" onConfirm={handleOutOfUseVehicle} okButtonProps={{ danger: true }}>
