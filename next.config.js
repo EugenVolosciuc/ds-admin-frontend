@@ -2,7 +2,6 @@
 // Decided against sass in the end
 const withLess = require("@zeit/next-less")
 const withCSS = require("@zeit/next-css")
-const { nextI18NextRewrites } = require('next-i18next/rewrites')
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 
 const isProd = process.env.NODE_ENV === "production"
@@ -33,9 +32,5 @@ module.exports = withCSS({
         lessLoaderOptions: {
             javascriptEnabled: true,
         },
-    }),
-    rewrites: async () => nextI18NextRewrites(localeSubpaths),
-    publicRuntimeConfig: {
-        localeSubpaths,
-    }
+    })
 })

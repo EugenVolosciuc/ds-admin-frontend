@@ -22,7 +22,7 @@ const VehiclesPage = () => {
     const [showCreateVehicleModal, setShowCreateVehicleModal] = useState(false)
     const [showUpdateVehicleModal, setShowUpdateVehicleModal] = useState(null)
 
-    const { user, userLoading } = useContext(authContext)
+    const { user } = useContext(authContext)
 
     const url = '/vehicles'
 
@@ -41,6 +41,16 @@ const VehiclesPage = () => {
         if (id) return setShowUpdateVehicleModal(id)
 
         return setShowUpdateVehicleModal(null)
+    }
+
+    const handleDeleteVehicle = async id => {
+        try {
+            await axios.delete(`/vehicles/${id}`)
+            message.success('Vehicle deleted')
+            await mutate('/users', data => ({ ...data, values }), true)
+        } catch (error) {
+            console.log("Error deleting user", error)
+        }
     }
 
     const handleTableChange = (pagination, filters, sorter, extra) => {
@@ -89,7 +99,14 @@ const VehiclesPage = () => {
             dataIndex: 'schoolLocation',
             key: 'schoolLocation',
             sorter: true,
-            render: schoolLocation => <span>{schoolLocation ? schoolLocation : '-'}</span>
+            render: schoolLocation => <span>{schoolLocation ? schoolLocation.name : '-'}</span>
+        },
+        {
+            title: 'Instructor',
+            dataIndex: 'instructor',
+            key: 'instructor',
+            sorter: true,
+            render: instructor => <span>{instructor ? `${instructor.firstName} ${instructor.lastName}` : '-'}</span>
         },
         {
             title: 'Category',
@@ -110,6 +127,26 @@ const VehiclesPage = () => {
             key: 'transmission',
             sorter: true,
             render: transmission => <span>{transmission ? TRANSMISSION_TYPES[transmission].label : '-'}</span>
+        },
+        {
+            title: 'Actions',
+            dataIndex: 'actions',
+            key: 'actions',
+            render: (text, record) => {
+                return <span>
+                    <EditOutlined style={{ marginRight: 16 }} onClick={() => toggleUpdateVehicleModal(record._id)} />
+                    <DeleteOutlined
+                        className="text-error"
+                        onClick={() => Modal.confirm({
+                            okText: 'Yes',
+                            cancelText: 'No',
+                            okButtonProps: { danger: true },
+                            onOk: () => handleDeleteVehicle(record._id),
+                            content: <span>Are you sure you want to delete {record.brand} {record.model}?</span>
+                        })}
+                    />
+                </span>
+            }
         }
     ]
 

@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 
-import { Link } from 'i18n'
+import Link from 'next/link'
 import { authContext } from 'utils/hoc/withAuth'
 
 const SuperAdminMenu = () => {

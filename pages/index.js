@@ -1,6 +1,6 @@
 import { Button } from 'antd'
 
-import { Link } from 'i18n'
+import Link from 'next/link'
 
 const Homepage = () => {
 	return (

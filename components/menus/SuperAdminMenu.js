@@ -7,8 +7,7 @@ import {
     DollarCircleOutlined
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-
-import { Link } from 'i18n'
+import Link from 'next/link'
 
 const SuperAdminMenu = () => {
     const router = useRouter()

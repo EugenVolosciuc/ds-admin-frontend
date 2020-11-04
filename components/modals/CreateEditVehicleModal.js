@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react'
 import { Modal, Form, Input, Select, Row, Col, DatePicker, Spin, AutoComplete, message } from 'antd'
 import axios from 'axios'
 import debounce from 'lodash/debounce'
+import dayjs from 'dayjs'
 
 import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
-import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
 import VEHICLE_CATEGORIES from 'constants/VEHICLE_CATEGORIES'
 import { authContext } from 'utils/hoc/withAuth'
 import USER_ROLES from 'constants/USER_ROLES'
@@ -19,10 +19,25 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
 
     const auth = useContext(authContext)
 
+    const getDataToUpdate = values => {
+        const { brand, category, instructorID, licensePlate, locationID, model, modelYear, transmission } = values
+
+        return {
+            brand,
+            category,
+            instructor: instructorID,
+            licensePlate,
+            schoolLocation: locationID,
+            model,
+            transmission,
+            modelYear: dayjs(modelYear).format('YYYY')
+        }
+    }
+
     const handleCreateVehicle = async values => {
-        setIsLoading('create')
+        setIsLoading('register')
         try {
-            await axios.post('/vehicles', values)
+            await axios.post('/vehicles', getDataToUpdate(values))
             setIsLoading(false)
             onCancel()
             message.success('Vehicle registered')
@@ -36,7 +51,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const handleUpdateVehicle = async values => {
         setIsLoading('update')
         try {
-            await axios.patch(`/vehicles/${vehicle._id}`, values)
+            await axios.patch(`/vehicles/${vehicle._id}`, getDataToUpdate(values))
             setIsLoading(false)
             onCancel()
             message.success('Vehicle modified')
@@ -53,9 +68,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 setIsLoading('locations')
                 const { data } = await axios.get('/school-locations/search', {
                     params: {
-                        search: {
-                            name: value
-                        },
+                        search: { name: value },
                         school: auth.user.school
                     }
                 })
@@ -78,17 +91,15 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 setIsLoading('instructors')
                 const { data } = await axios.get('/users/search', {
                     params: {
-                        search: {
-                            lastName: value
-                        },
+                        search: { lastName: value }, // TODO: somehow check firstname as well
                         school: auth.user.school,
                         role: USER_ROLES.INSTRUCTOR.tag
                     }
                 })
 
                 setInstructorOptions({
-                    instructorNames: data.map(instructor => ({ value: instructor.name })),
-                    instructorNamesandIDs: data.map(instructor => ({ id: instructor._id, name: instructor.name }))
+                    instructorNames: data.map(instructor => ({ value: `${instructor.lastName} ${instructor.firstName}` })),
+                    instructorNamesandIDs: data.map(instructor => ({ id: instructor._id, name: `${instructor.lastName} ${instructor.firstName}` }))
                 })
             } catch (error) {
                 console.log("Error searching for instructors", error)
@@ -101,24 +112,33 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const handleSelectLocation = selectedLocation => {
         const chosenLocation = locationOptions.locationNamesandIDs.filter(locationOption => locationOption.name === selectedLocation)[0]
 
-        form.setFieldsValue({ location: chosenLocation.name, locationID: chosenLocation._id })
+        form.setFieldsValue({ location: chosenLocation.name, locationID: chosenLocation.id })
     }
 
     const handleSelectInstructor = selectedInstructor => {
         const chosenInstructor = instructorOptions.instructorNamesandIDs.filter(instructorOption => instructorOption.name === selectedInstructor)[0]
 
-        form.setFieldsValue({ instructor: chosenInstructor.name, instructorID: chosenInstructor._id })
+        form.setFieldsValue({ instructor: chosenInstructor.name, instructorID: chosenInstructor.id })
     }
 
     const initialValues = vehicle ? {
         brand: vehicle.brand,
         model: vehicle.model,
-        modelYear: vehicle.modelYear,
+        modelYear: dayjs(vehicle.modelYear),
         licensePlate: vehicle.licensePlate,
         category: vehicle.category,
-        transmission: vehicle.transmission
+        ...(vehicle.transmission && { transmission: vehicle.transmission }),
+        ...(vehicle.schoolLocation && {
+            location: vehicle.schoolLocation.name,
+            locationID: vehicle.schoolLocation._id
+        }),
+        ...(vehicle.instructor && {
+            instructor: `${vehicle.instructor.firstName} ${vehicle.instructor.lastName}`,
+            instructorID: vehicle.instructor._id
+        }),
     } : {}
 
+    console.log("VEHICLE!!", vehicle)
     const modalTitle = isUpdateModal ? 'Update vehicle' : 'Register vehicle'
 
     return (
@@ -129,7 +149,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             onCancel={() => onCancel()}
             cancelText="Cancel"
             okText={modalTitle}
-            okButtonProps={{ loading: isLoading }}
+            okButtonProps={{ loading: isLoading === 'register' || isLoading === 'update' }}
             onOk={() => {
                 form.validateFields()
                     .then(values => {
@@ -161,7 +181,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 <Row>
                     <Col span={11}>
                         <Form.Item name="modelYear" label="Model Year" rules={[{ required: true, message: "Model year is required" }]}>
-                            <DatePicker picker="year" className="w-full" />
+                            <DatePicker picker="year" className="w-full" disabledDate={current => current && current > dayjs()} placeholder="" />
                         </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
@@ -194,19 +214,6 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                {/* Probably not needed, why would someone move a vehicle from a school to another? */}
-                {/* <Row>
-                    <Col span={11}>
-                        <Form.Item name="school" label="School">
-
-                        </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                        <Form.Item>
-
-                        </Form.Item>
-                    </Col>
-                </Row> */}
                 <Row>
                     <Col span={11}>
                         <Form.Item name="location" label="School location">
@@ -217,7 +224,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                                 <Input.Search loading={isLoading === 'locations'} />
                             </AutoComplete>
                         </Form.Item>
-                        <Form.Item // Used to get the locationID when the location is selected in the next form item
+                        <Form.Item
                             hidden
                             name="locationID"
                         >
@@ -233,7 +240,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                                 <Input.Search loading={isLoading === 'instructors'} />
                             </AutoComplete>
                         </Form.Item>
-                        <Form.Item // Used to get the instructorID when the location is selected in the next form item
+                        <Form.Item
                             hidden
                             name="instructorID"
                         >
