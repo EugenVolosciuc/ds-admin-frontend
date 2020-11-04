@@ -1,10 +1,12 @@
 import React, { useState, useContext } from 'react'
-import { Modal, Form, Input, Select, Row, Col, DatePicker, Spin, AutoComplete, message } from 'antd'
+import { Modal, Form, Input, Select, Row, Col, DatePicker, Button, Tooltip, Popconfirm, Spin, AutoComplete, message } from 'antd'
+import { InfoCircleOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import debounce from 'lodash/debounce'
 import dayjs from 'dayjs'
 
 import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
+import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
 import VEHICLE_CATEGORIES from 'constants/VEHICLE_CATEGORIES'
 import { authContext } from 'utils/hoc/withAuth'
 import USER_ROLES from 'constants/USER_ROLES'
@@ -56,6 +58,19 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             onCancel()
             message.success('Vehicle modified')
             await mutate('/vehicles', data => ({ ...data, values }), true) // TODO: not working!
+        } catch (error) {
+            setIsLoading(false)
+            console.log("Error modifying vehicle", error)
+        }
+    }
+
+    const handleOutOfUseVehicle = async () => {
+        setIsLoading('out of use')
+        try {
+            await axios.patch(`/vehicles/${vehicle._id}`, { status: VEHICLE_STATUSES.INOPERATIVE.tag})
+            setIsLoading(false)
+            onCancel()
+            message.success('Vehicle set out of use')
         } catch (error) {
             setIsLoading(false)
             console.log("Error modifying vehicle", error)
@@ -138,8 +153,33 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
         }),
     } : {}
 
-    console.log("VEHICLE!!", vehicle)
     const modalTitle = isUpdateModal ? 'Update vehicle' : 'Register vehicle'
+    const modalFooter = (
+        <Row justify={isUpdateModal ? "space-between" : "end"}>
+            {isUpdateModal &&
+                <Col span={12}>
+                    <Row align="middle" justify="start">
+                        <Popconfirm title="Are you sure you want to put this vehicle out of use?" onConfirm={handleOutOfUseVehicle} okButtonProps={{ danger: true }}>
+                            <Button danger loading={isLoading === 'out of use'}>Out of use</Button>
+                        </Popconfirm>
+                        <Tooltip title="Out of use vehicles will not be selectable for further lessons, the lessons that are already scheduled will be canceled.">
+                            <InfoCircleOutlined style={{ marginLeft: 8 }} />
+                        </Tooltip>
+                    </Row>
+                </Col>
+            }
+            <Col span={12}>
+                <Button onClick={() => onCancel()}>Cancel</Button>
+                <Button
+                    onClick={() => form.validateFields().then(values => isUpdateModal ? handleUpdateVehicle(values) : handleCreateVehicle(values))}
+                    loading={isLoading === 'register' || isLoading === 'update'}
+                    type="primary"
+                >
+                    {modalTitle}
+                </Button>
+            </Col>
+        </Row>
+    )
 
     return (
         <Modal
@@ -147,18 +187,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             visible={visible}
             title={<span className="bold">{modalTitle}</span>}
             onCancel={() => onCancel()}
-            cancelText="Cancel"
-            okText={modalTitle}
-            okButtonProps={{ loading: isLoading === 'register' || isLoading === 'update' }}
-            onOk={() => {
-                form.validateFields()
-                    .then(values => {
-                        isUpdateModal ? handleUpdateVehicle(values) : handleCreateVehicle(values)
-                    })
-                    .catch(error => {
-                        console.log("Validation Failed: ", error)
-                    })
-            }}
+            footer={modalFooter}
         >
             <Form
                 form={form}
@@ -248,7 +277,6 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                         </Form.Item>
                     </Col>
                 </Row>
-                {/* TODO: Create a button that sets the machine as inopperable (it broke) */}
             </Form>
         </Modal>
     )
