@@ -9,6 +9,7 @@ import { authContext } from 'utils/hoc/withAuth'
 
 const { Option } = Select
 
+// userRole - role of the edited user
 const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
     const [isLoading, setIsLoading] = useState(false)
     const isUpdateModal = !!user
@@ -53,14 +54,13 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
         role: user.role
     } : {}
 
-    const modalTitle = isUpdateModal ? `Update ${userRole?.label || 'User'}` : `Register ${userRole?.label || 'User'}`
+    const modalTitle = isUpdateModal ? `Update ${(userRole?.label || 'User').toLowerCase()}` : `Register ${(userRole?.label || 'User').toLowerCase()}`
 
     return (
         <Modal
             destroyOnClose
             visible={visible}
-            title={<span className="bold">{modalTitle}</span>
-            }
+            title={<span className="bold">{modalTitle}</span>}
             onCancel={() => onCancel()}
             cancelText="Cancel"
             okText={modalTitle}

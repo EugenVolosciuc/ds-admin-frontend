@@ -122,7 +122,7 @@ const InstructorsPage = () => {
 
     const pageHeaderExtra = (
         <Button size="middle" type="primary" onClick={toggleCreateUserModal}>
-            Register Instructor
+            Register instructor
         </Button>
     )
 

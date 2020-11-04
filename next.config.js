@@ -1,6 +1,5 @@
 // Used this article to configure project to use sass, while customizing antd with less - https://dev.to/burhanuday/using-ant-design-with-nextjs-custom-variables-for-ant-design-57m5
-// Had to install "sass" as well for it to work
-const withSass = require("@zeit/next-sass")
+// Decided against sass in the end
 const withLess = require("@zeit/next-less")
 const withCSS = require("@zeit/next-css")
 const { nextI18NextRewrites } = require('next-i18next/rewrites')
@@ -30,13 +29,11 @@ module.exports = withCSS({
         importLoaders: 1,
         localIdentName: "[local]___[hash:base64:5]",
     },
-    ...withLess(
-        withSass({
-            lessLoaderOptions: {
-                javascriptEnabled: true,
-            },
-        })
-    ),
+    ...withLess({
+        lessLoaderOptions: {
+            javascriptEnabled: true,
+        },
+    }),
     rewrites: async () => nextI18NextRewrites(localeSubpaths),
     publicRuntimeConfig: {
         localeSubpaths,

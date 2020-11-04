@@ -12,26 +12,36 @@ import USER_ROLES from 'constants/USER_ROLES'
 import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
 import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
 import fetcher from 'utils/functions/fetcher'
-import CreateEditUserModal from 'components/modals/CreateEditUserModal'
 import { authContext } from 'utils/hoc/withAuth'
+import CreateEditVehicleModal from 'components/modals/CreateEditVehicleModal'
 
 const VehiclesPage = () => {
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(15)
     const [sortBy, setSortBy] = useState({})
+    const [showCreateVehicleModal, setShowCreateVehicleModal] = useState(false)
+    const [showUpdateVehicleModal, setShowUpdateVehicleModal] = useState(null)
 
     const { user, userLoading } = useContext(authContext)
 
     const url = '/vehicles'
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
-        filters: { 
+        filters: {
             school: user.school
         },
         sortBy,
         page,
         perPage
     }))
+
+    const toggleCreateVehicleModal = () => setShowCreateVehicleModal(!showCreateVehicleModal)
+
+    const toggleUpdateVehicleModal = id => {
+        if (id) return setShowUpdateVehicleModal(id)
+
+        return setShowUpdateVehicleModal(null)
+    }
 
     const handleTableChange = (pagination, filters, sorter, extra) => {
         switch (extra.action) {
@@ -103,8 +113,20 @@ const VehiclesPage = () => {
         }
     ]
 
+    const pageHeaderExtra = (
+        <Button size="middle" type="primary" onClick={toggleCreateVehicleModal}>
+            Register vehicle
+        </Button>
+    )
+
     return (
-        <DashboardLayout title="Vehicles">
+        <DashboardLayout title="Vehicles" pageHeaderExtra={pageHeaderExtra}>
+            {/* Create Vehicle Modal */}
+            <CreateEditVehicleModal visible={showCreateVehicleModal} onCancel={toggleCreateVehicleModal} />
+            {/* Update Vehicle Modal */}
+            {!isNull(showUpdateVehicleModal) &&
+                <CreateEditVehicleModal visible={showUpdateVehicleModal} onCancel={toggleUpdateVehicleModal} vehicle={data?.vehicles.find(vehicle => vehicle._id === showUpdateVehicleModal)} />
+            }
             <Table
                 rowKey="_id"
                 loading={isValidating}

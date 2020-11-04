@@ -125,6 +125,7 @@ const useProvideAuth = () => {
         } catch (error) {
             console.log("ERROR CHECKING AUTH", error)
             setUser(null)
+            router.push('/')
             setUserLoading(false)
         }
     }
