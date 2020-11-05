@@ -13,7 +13,7 @@ import fetcher from 'utils/functions/fetcher'
 import CreateEditUserModal from 'components/modals/CreateEditUserModal'
 import { authContext } from 'utils/hoc/withAuth'
 
-const StudentsPage = () => {
+const InstructorsPage = () => {
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(15)
     const [sortBy, setSortBy] = useState({})
@@ -27,7 +27,7 @@ const StudentsPage = () => {
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: { 
             school: user.school,
-            role: USER_ROLES.STUDENT.tag
+            role: USER_ROLES.INSTRUCTOR.tag
         },
         sortBy,
         page,
@@ -92,13 +92,6 @@ const StudentsPage = () => {
         },
         // TODO: add location
         {
-            title: 'Role',
-            dataIndex: 'role',
-            key: 'role',
-            sorter: true,
-            render: text => <span>{USER_ROLES[text].label}</span>
-        },
-        {
             title: 'Created at',
             dataIndex: 'createdAt',
             key: 'createdAt',
@@ -129,25 +122,26 @@ const StudentsPage = () => {
 
     const pageHeaderExtra = (
         <Button size="middle" type="primary" onClick={toggleCreateUserModal}>
-            Register student
+            Register instructor
         </Button>
     )
 
     return (
-        <DashboardLayout title="Students" pageHeaderExtra={pageHeaderExtra}>
+        <DashboardLayout title="Instructors" pageHeaderExtra={pageHeaderExtra}>
             {/* Create User Modal */}
             <CreateEditUserModal 
                 visible={showCreateUserModal} 
                 onCancel={toggleCreateUserModal} 
-                userRole={USER_ROLES.STUDENT}
+                userRole={USER_ROLES.INSTRUCTOR} 
             />
+
             {/* Update User Modal */}
             {!isNull(showUpdateUserModal) &&
                 <CreateEditUserModal 
                     visible={showUpdateUserModal} 
                     onCancel={toggleUpdateUserModal} 
-                    user={data?.users.find(user => user._id === showUpdateUserModal)}
-                    userRole={USER_ROLES.STUDENT}
+                    user={data?.users.find(user => user._id === showUpdateUserModal)} 
+                    userRole={USER_ROLES.INSTRUCTOR}
                 />
             }
 
@@ -169,7 +163,7 @@ const StudentsPage = () => {
 }
 
 export default withAuth(
-    StudentsPage,
+    InstructorsPage,
     [
         USER_ROLES.SUPER_ADMIN.tag,
         USER_ROLES.SCHOOL_ADMIN.tag,

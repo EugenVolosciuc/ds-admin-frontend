@@ -8,7 +8,7 @@ const Dashboard = () => {
     return (
         <DashboardLayout title="Dashboard">
             <div>
-                <p>This page should be auth only</p>
+                <p>Super Admin Dashboard</p>
             </div>
         </DashboardLayout>
     )

@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next-translate && next dev",
-    "build": "next-translate && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start"
   },
   "dependencies": {
@@ -14,11 +14,13 @@
     "axios": "^0.21.0",
     "babel-plugin-import": "^1.13.1",
     "dayjs": "^1.9.4",
+    "i18next-browser-languagedetector": "^6.0.1",
+    "i18next-http-backend": "^1.0.21",
     "less": "^3.12.2",
     "lodash": "^4.17.20",
     "next": "^10.0.1",
     "next-cookies": "^2.0.3",
-    "next-translate": "^0.19.4",
+    "next-i18next": "^7.0.1",
     "qs": "^6.9.4",
     "react": "17.0.1",
     "react-dom": "17.0.1",

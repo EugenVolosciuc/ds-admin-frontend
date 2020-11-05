@@ -10,7 +10,7 @@ import {
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 
-import Link from 'next/link'
+import { Link } from 'i18n'
 import { authContext } from 'utils/hoc/withAuth'
 
 const SuperAdminMenu = () => {
@@ -35,8 +35,8 @@ const SuperAdminMenu = () => {
             <Menu.Item key="/app/schools/[school_id]/vehicles" icon={<CarOutlined />}>
                 <Link href="/app/schools/[school_id]/vehicles" as={`/app/schools/${user.school}/vehicles`}><a>Vehicles</a></Link>
             </Menu.Item>
-            <Menu.Item key="/app/calendar" icon={<CalendarOutlined />}>
-                <Link href="/app/calendar" as="/app/calendar"><a>Calendar</a></Link>
+            <Menu.Item key="/app/schools/[school_id]/calendar" icon={<CalendarOutlined />}>
+                <Link href="/app/schools/[school_id]/calendar" as={`/app/schools/${user.school}/calendar`}><a>Calendar</a></Link>
             </Menu.Item>
         </Menu>
     )

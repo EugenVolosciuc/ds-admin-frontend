@@ -23,7 +23,7 @@ const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
     const toggleSider = () => setSiderIsCollapsed(!siderIsCollapsed)
 
     const menu = (
-        <Menu>
+        <Menu triggerSubMenuAction="click">
             <Menu.Item>
                 <span onClick={logout}>
                     Logout

@@ -1,10 +1,11 @@
 import { ProvideAuth } from 'utils/hoc/withAuth'
 
+import { appWithTranslation } from 'i18n'
 import 'antd/dist/antd.css'
 import 'config/axios'
 import 'styles/styles.less'
 
-const MyApp = ({ Component, pageProps }) => {
+const DSAdmin = ({ Component, pageProps }) => {
 	return (
 		<ProvideAuth>
 			<Component {...pageProps} />
@@ -12,4 +13,4 @@ const MyApp = ({ Component, pageProps }) => {
 	)
 }
 
-export default MyApp
+export default appWithTranslation(DSAdmin)

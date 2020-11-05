@@ -5,7 +5,7 @@ import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout.
 const SchoolPage = () => {
     return (
         <DashboardLayout title="School name">
-            <p>School page</p>
+            <p>School dashboard</p>
         </DashboardLayout>
     )
 }

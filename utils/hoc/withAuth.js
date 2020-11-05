@@ -35,8 +35,6 @@ export const withAuth = (Component, authOption) => {
             const needRedirect = () => {
                 if (authOption === false) {
                     return true
-                } else if (!user) {
-                    return true
                 } else {
                     if (Array.isArray(authOption)) {
                         if (!authOption.includes(user.role)) return true
@@ -92,7 +90,7 @@ const useProvideAuth = () => {
             const { data } = await axios.post('/users/login', values)
             setUser(data)
             setUserLoading(false)
-            router.push('/app/dashboard', '/app/dashboard')
+            router.push('/app/admin', '/app/admin')
         } catch (error) {
             setUserLoading(false)
             console.log(error)
