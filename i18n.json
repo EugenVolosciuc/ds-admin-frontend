@@ -1,0 +1,21 @@
+{
+    "locales": [
+        "en",
+        "ro"
+    ],
+    "defaultLocale": "en",
+    "currentPagesDir": "pages_",
+    "finalPagesDir": "pages",
+    "localesPath": "locales",
+    "pages": {
+        "*": [
+            "common"
+        ],
+        "/app": [
+            "app"
+        ],
+        "/admin": [
+            "admin"
+        ]
+    }
+}

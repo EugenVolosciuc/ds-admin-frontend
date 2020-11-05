@@ -4,6 +4,8 @@ const withLess = require("@zeit/next-less")
 const withCSS = require("@zeit/next-css")
 const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 
+const { locales, defaultLocale } = require('./i18n.json')
+
 const isProd = process.env.NODE_ENV === "production"
 const localeSubpaths = {}
 
@@ -32,5 +34,6 @@ module.exports = withCSS({
         lessLoaderOptions: {
             javascriptEnabled: true,
         },
-    })
+    }),
+    i18n: { locales, defaultLocale }
 })
