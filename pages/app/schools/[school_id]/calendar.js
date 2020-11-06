@@ -1,6 +1,5 @@
 import React, { useContext } from 'react'
 import { Row, Col } from 'antd'
-import dayjs from 'dayjs'
 import useSWR from 'swr'
 
 import { withAuth } from 'utils/hoc/withAuth'

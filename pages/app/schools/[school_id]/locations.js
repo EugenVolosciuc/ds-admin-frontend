@@ -4,7 +4,6 @@ import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import useSWR from 'swr'
 import isNull from 'lodash/isNull'
 import axios from 'axios'
-import dayjs from 'dayjs'
 
 import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout.js'
 import { withAuth } from 'utils/hoc/withAuth'

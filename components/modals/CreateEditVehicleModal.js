@@ -3,7 +3,7 @@ import { Modal, Form, Input, Select, Row, Col, DatePicker, Button, Tooltip, Popc
 import { InfoCircleOutlined } from '@ant-design/icons'
 import axios from 'axios'
 import debounce from 'lodash/debounce'
-import dayjs from 'dayjs'
+import moment from 'moment'
 
 import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
 import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
@@ -32,7 +32,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             schoolLocation: locationID,
             model,
             transmission,
-            modelYear: dayjs(modelYear).format('YYYY')
+            modelYear: moment(modelYear).format('YYYY')
         }
     }
 
@@ -139,7 +139,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const initialValues = vehicle ? {
         brand: vehicle.brand,
         model: vehicle.model,
-        modelYear: dayjs(vehicle.modelYear),
+        modelYear: moment(vehicle.modelYear),
         licensePlate: vehicle.licensePlate,
         category: vehicle.category,
         ...(vehicle.transmission && { transmission: vehicle.transmission }),
@@ -211,7 +211,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 <Row>
                     <Col span={11}>
                         <Form.Item name="modelYear" label="Model Year" rules={[{ required: true, message: "Model year is required" }]}>
-                            <DatePicker picker="year" className="w-full" disabledDate={current => current && current > dayjs()} placeholder="" />
+                            <DatePicker picker="year" className="w-full" disabledDate={current => current && current > moment()} placeholder="" />
                         </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>

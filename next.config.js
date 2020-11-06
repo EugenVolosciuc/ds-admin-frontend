@@ -3,9 +3,7 @@
 const withLess = require("@zeit/next-less")
 const withCSS = require("@zeit/next-css")
 const { nextI18NextRewrites } = require('next-i18next/rewrites')
-const AntdDayjsWebpackPlugin = require('antd-dayjs-webpack-plugin')
 
-const isProd = process.env.NODE_ENV === "production"
 const localeSubpaths = {}
 
 // fix: prevents error when .less files are required by node
@@ -14,16 +12,14 @@ if (typeof require !== "undefined") {
 }
 
 module.exports = withCSS({
-    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
-        // Note: we provide webpack above so you should not `require` it
-        // Perform customizations to webpack config
-        config.plugins.push(new webpack.IgnorePlugin(/\/__tests__\//))
+    // webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    //     // Note: we provide webpack above so you should not `require` it
+    //     // Perform customizations to webpack config
+    //     config.plugins.push(new webpack.IgnorePlugin(/\/__tests__\//))
 
-        config.plugins.push(new AntdDayjsWebpackPlugin())
-
-        // Important: return the modified config
-        return config
-    },
+    //     // Important: return the modified config
+    //     return config
+    // },
     cssModules: true,
     cssLoaderOptions: {
         importLoaders: 1,
