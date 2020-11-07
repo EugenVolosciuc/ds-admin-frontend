@@ -1,41 +1,61 @@
-import React, { useContext } from 'react'
-import { Row, Col } from 'antd'
-import useSWR from 'swr'
+import React, { useState, useEffect, useContext } from 'react'
+import { Row, Col, Select, Spin } from 'antd'
 
-import { withAuth } from 'utils/hoc/withAuth'
 import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout'
 import LessonCalendar from 'components/cards/LessonCalendar/LessonCalendar'
-import { authContext } from 'utils/hoc/withAuth'
-import fetcher from 'utils/functions/fetcher'
+import { schoolContext } from 'utils/contexts/schoolContext'
+import { withAuth, authContext } from 'utils/hoc/withAuth'
+import USER_ROLES from 'constants/USER_ROLES'
+
 
 const CalendarPage = () => {
+    const [isLoading, setIsLoading] = useState(false)
+    const [location, setLocation] = useState(null)
+
+    const { school, schoolLoading } = useContext(schoolContext)
     const { user, userLoading } = useContext(authContext)
-    const url = '/lessons'
 
-    const { data, error, isValidating, mutate } = useSWR([url], () => fetcher(url, {
-        filters: { 
-            school: user.school,
-            startAt: '2020-10-01',
-            endAt: '2020-11-01'
-        }
-    }))
+    const singleLocation = school?.locations?.length === 1
+    const showPageHeaderExtra = schoolLoading && userLoading ? false : singleLocation && user?.role === USER_ROLES.SCHOOL_ADMIN.tag ? false : true
 
-    const handleDaySelect = date => {
-        console.log("date", date)
+    const handleSelectLocation = selectedLocationID => {
+        setLocation(locations.find(location => location._id === selectedLocationID))
     }
 
+    const pageHeaderExtra = (
+        <Select value={location?._id} onChange={handleSelectLocation} style={{ width: 200 }}>
+            {(school?.locations || []).map(location => (
+                <Select.Option value={location._id} key={location._id}>{location.name}</Select.Option>
+            ))}
+        </Select>
+    )
+
+    useEffect(() => {
+        if (school && user.role === USER_ROLES.SCHOOL_ADMIN.tag) setLocation(school.locations[0])
+    }, [school])
+
+    useEffect(() => {
+        if (user && user.location) setLocation(user.location)
+    }, [user])
+
     return (
-        <DashboardLayout title="Calendar">
-            <Row gutter={8}>
-                {/* Lesson requests */}
-                <Col xs={24} md={6}>
-                    <p>Lesson requests</p>
-                </Col>
-                {/* Calendar */}
-                <Col xs={24} md={18}>
-                    <LessonCalendar handleSelect={handleDaySelect} />
-                </Col>
-            </Row>
+        <DashboardLayout title="Calendar" pageHeaderExtra={showPageHeaderExtra ? pageHeaderExtra : null}>
+            {/* <DashboardLayout title="Calendar" pageHeaderExtra={singleLocation ? null : pageHeaderExtra}> */}
+            {schoolLoading
+                ? <Row justify="center"><Spin /></Row>
+                : <Row gutter={8}>
+                    {/* Lesson requests */}
+                    <Col xs={24} md={6}>
+                        <p>Lesson requests</p>
+                    </Col>
+                    {/* Calendar */}
+                    <Col xs={24} md={18}>
+                        {/* TODO: create a search bar in the top for the school admin, so that he can search for specific locations' lessons calendar. */}
+                        {/* If the school only has one location, don't show the search bar. */}
+                        <LessonCalendar location={location} />
+                    </Col>
+                </Row>
+            }
         </DashboardLayout>
     )
 }

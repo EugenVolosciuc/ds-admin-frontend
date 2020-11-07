@@ -1,15 +1,16 @@
 import { ProvideAuth } from 'utils/hoc/withAuth'
-
+import ProvideSchool from 'utils/contexts/schoolContext'
 import { appWithTranslation } from 'i18n'
-import 'react-big-calendar/lib/css/react-big-calendar.css'
-import 'antd/dist/antd.css'
 import 'config/axios'
+import 'styles/package-styles.less'
 import 'styles/styles.less'
 
 const DSAdmin = ({ Component, pageProps }) => {
 	return (
 		<ProvideAuth>
-			<Component {...pageProps} />
+			<ProvideSchool>
+				<Component {...pageProps} />
+			</ProvideSchool>
 		</ProvideAuth>
 	)
 }
