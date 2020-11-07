@@ -170,7 +170,19 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
     }
 
     const initialValues = lesson
-        ? {}
+        ? {
+            date: moment(lesson.start),
+            start: moment(lesson.start),
+            end: moment(lesson.end),
+            instructor: `${lesson.instructor.lastName} ${lesson.instructor.firstName}`,
+            instructorID: lesson.instructor._id,
+            vehicle: `${lesson.vehicle.brand} ${lesson.vehicle.model}`,
+            vehicleID: lesson.vehicle._id,
+            student: `${lesson.student.lastName} ${lesson.student.firstName}`,
+            studentID: lesson.student._id,
+            location: lesson.location.name,
+            locationID: lesson.location._id,
+        }
         : visibleIsSlot
             ? {
                 date: moment(visible.start),

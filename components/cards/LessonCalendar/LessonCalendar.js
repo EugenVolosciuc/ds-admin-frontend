@@ -21,8 +21,8 @@ const exampleEvent = {
 }
 
 const LessonCalendar = ({ location }) => {
-    const [lessons, setLessons] = useState([exampleEvent]) // TODO: delete when useSWR will work properly
     const [showCreateLessonModal, setShowCreateLessonModal] = useState(false) // can be true, false or slotInfo
+    const [showUpdateLessonModal, setShowUpdateLessonModal] = useState(null)
     const [calendarRangeStart, setCalendarRangeStart] = useState(moment().toDate())
     const [view, setView] = useState('week')
 
@@ -38,17 +38,23 @@ const LessonCalendar = ({ location }) => {
         }
     }))
 
-    console.log("DATA!!!", data)
-
     const toggleCreateLessonModal = () => setShowCreateLessonModal(!showCreateLessonModal)
+
+    const toggleUpdateLessonModal = id => {
+        if (id) return setShowUpdateLessonModal(id)
+
+        return setShowUpdateLessonModal(null)
+    }
+
     const handleSelectSlot = slotInfo => setShowCreateLessonModal(slotInfo)
+    const handleSelectEvent = event => setShowUpdateLessonModal(event.resource)
     const handleRangeChange = range => setCalendarRangeStart(range[0])
     const handleNavigate = navigatedDate => setCalendarRangeStart(navigatedDate)
     const handleViewChange = newView => setView(newView)
 
     const calculateCalendarRange = extremity => {
         if (extremity == 'start') {
-            switch(view) {
+            switch (view) {
                 case 'week':
                     return moment(calendarRangeStart).startOf('week')
                 case 'day':
@@ -56,7 +62,7 @@ const LessonCalendar = ({ location }) => {
                     return moment(calendarRangeStart).startOf('day')
             }
         } else {
-            switch(view) {
+            switch (view) {
                 case 'week':
                     return moment(calendarRangeStart).endOf('week')
                 case 'day':
@@ -96,7 +102,16 @@ const LessonCalendar = ({ location }) => {
         <Card className="hide-calendar-mode-selector">
             {/* Create Lesson Modal */}
             {showCreateLessonModal &&
-                <CreateEditLessonModal visible={showCreateLessonModal} onCancel={toggleCreateLessonModal} />            
+                <CreateEditLessonModal visible={showCreateLessonModal} onCancel={toggleCreateLessonModal} />
+            }
+
+            {/* Update Lesson Modal */}
+            {showUpdateLessonModal &&
+                <CreateEditLessonModal
+                    visible={showUpdateLessonModal}
+                    onCancel={toggleUpdateLessonModal}
+                    lesson={data?.find(lesson => lesson._id === showUpdateLessonModal)}
+                />
             }
 
             <Calendar
@@ -106,10 +121,11 @@ const LessonCalendar = ({ location }) => {
                 date={calendarRangeStart}
                 views={['day', 'week']}
                 selectable={true}
-                onSelectSlot={handleSelectSlot}
+                onSelectSlot={handleSelectSlot} // TODO: replace this with onSelecting, so that I can return false when an overlapping selection is made
                 onRangeChange={handleRangeChange}
                 onNavigate={handleNavigate}
                 onView={handleViewChange}
+                onSelectEvent={handleSelectEvent}
             />
         </Card>
     )
