@@ -154,8 +154,9 @@ const useProvideAuth = () => {
             setUser(data)
             setUserLoading(false)
 
-            const urls = redirectURLs(data)
-            router.push(urls.href, urls.as)
+            // TODO: decide if this router push is necessary
+            // const urls = redirectURLs(data)
+            // router.push(urls.href, urls.as)
         } catch (error) {
             console.log("ERROR CHECKING AUTH", error)
             setUser(null)

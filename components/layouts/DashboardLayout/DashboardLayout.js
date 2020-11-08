@@ -57,7 +57,7 @@ const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
                                 : <MenuFoldOutlined className={styles.trigger} onClick={toggleSider} />
                             }
                             <Dropdown overlay={menu}>
-                                <a className={styles.dropdown}>{user.firstName} {user.lastName} <DownOutlined /></a>
+                                <a className={styles.dropdown}>{user.lastName} {user.firstName} <DownOutlined /></a>
                             </Dropdown>
                         </div>
                     </Header>

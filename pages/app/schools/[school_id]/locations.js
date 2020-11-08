@@ -1,15 +1,11 @@
 import React, { useState, useContext } from 'react'
 import { Modal, Button, Table, message } from 'antd'
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import useSWR from 'swr'
-import isNull from 'lodash/isNull'
-import axios from 'axios'
 
 import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout.js'
 import { withAuth } from 'utils/hoc/withAuth'
 import USER_ROLES from 'constants/USER_ROLES'
 import fetcher from 'utils/functions/fetcher'
-import CreateEditUserModal from 'components/modals/CreateEditUserModal'
 import { authContext } from 'utils/hoc/withAuth'
 
 const LocationsPage = () => {
@@ -19,7 +15,7 @@ const LocationsPage = () => {
 
     const { user, userLoading } = useContext(authContext)
 
-    const url = '/school-locations'
+    const url = '/locations'
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: { 

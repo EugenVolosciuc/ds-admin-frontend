@@ -5,7 +5,7 @@ const handleLocationSearch = debounce(async (value, setIsLoading, auth, setLocat
     if (value.length > 2) {
         try {
             setIsLoading('locations')
-            const { data } = await axios.get('/school-locations/search', {
+            const { data } = await axios.get('/locations/search', {
                 params: {
                     search: { name: value },
                     school: auth.user.school._id
