@@ -3,6 +3,7 @@ import React, { useContext } from 'react'
 import { authContext } from 'utils/hoc/withAuth'
 import SuperAdminMenu from 'components/menus/SuperAdminMenu'
 import SchoolAdminMenu from 'components/menus/SchoolAdminMenu'
+import InstructorMenu from 'components/menus/InstructorMenu'
 import USER_ROLES from 'constants/USER_ROLES'
 
 const MainMenu = () => {
@@ -14,6 +15,8 @@ const MainMenu = () => {
                 return <SuperAdminMenu />
             case USER_ROLES.SCHOOL_ADMIN.tag:
                 return <SchoolAdminMenu />
+            case USER_ROLES.INSTRUCTOR.tag:
+                return <InstructorMenu />
             default:
                 return null
         }

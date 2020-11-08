@@ -2,14 +2,16 @@ import React, { useState, useContext } from 'react'
 import { Modal, Form, Input, Select, Row, Col, DatePicker, Button, Tooltip, Popconfirm, Spin, AutoComplete, message } from 'antd'
 import { InfoCircleOutlined } from '@ant-design/icons'
 import axios from 'axios'
-import debounce from 'lodash/debounce'
 import moment from 'moment'
 
 import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
 import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
 import VEHICLE_CATEGORIES from 'constants/VEHICLE_CATEGORIES'
 import { authContext } from 'utils/hoc/withAuth'
-import USER_ROLES from 'constants/USER_ROLES'
+import handleLocationSearch from 'utils/functions/searches/handleLocationSearch'
+import handleInstructorSearch from 'utils/functions/searches/handleInstructorSearch'
+import handleSelectInstructor from 'utils/functions/selectors/handleSelectInstructor'
+import handleSelectLocation from 'utils/functions/selectors/handleSelectLocation'
 
 const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const [isLoading, setIsLoading] = useState(false)
@@ -21,7 +23,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
 
     const auth = useContext(authContext)
 
-    const getDataToUpdate = values => {
+    const getDataToSend = values => {
         const { brand, category, instructorID, licensePlate, locationID, model, modelYear, transmission } = values
 
         return {
@@ -29,7 +31,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             category,
             instructor: instructorID,
             licensePlate,
-            schoolLocation: locationID,
+            location: locationID,
             model,
             transmission,
             modelYear: moment(modelYear).format('YYYY')
@@ -39,7 +41,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const handleCreateVehicle = async values => {
         setIsLoading('register')
         try {
-            await axios.post('/vehicles', getDataToUpdate(values))
+            await axios.post('/vehicles', getDataToSend(values))
             setIsLoading(false)
             onCancel()
             message.success('Vehicle registered')
@@ -53,7 +55,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const handleUpdateVehicle = async values => {
         setIsLoading('update')
         try {
-            await axios.patch(`/vehicles/${vehicle._id}`, getDataToUpdate(values))
+            await axios.patch(`/vehicles/${vehicle._id}`, getDataToSend(values))
             setIsLoading(false)
             onCancel()
             message.success('Vehicle modified')
@@ -77,65 +79,6 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
         }
     }
 
-    const handleLocationSearch = debounce(async value => {
-        if (value.length > 2) {
-            try {
-                setIsLoading('locations')
-                const { data } = await axios.get('/school-locations/search', {
-                    params: {
-                        search: { name: value },
-                        school: auth.user.school
-                    }
-                })
-
-                setLocationOptions({
-                    locationNames: data.map(location => ({ value: location.name })),
-                    locationNamesandIDs: data.map(location => ({ id: location._id, name: location.name }))
-                })
-            } catch (error) {
-                console.log("Error searching for locations", error)
-            }
-
-            setIsLoading(false)
-        }
-    }, 500)
-
-    const handleInstructorSearch = debounce(async value => {
-        if (value.length > 2) {
-            try {
-                setIsLoading('instructors')
-                const { data } = await axios.get('/users/search', {
-                    params: {
-                        search: { lastName: value }, // TODO: somehow check firstname as well
-                        school: auth.user.school,
-                        role: USER_ROLES.INSTRUCTOR.tag
-                    }
-                })
-
-                setInstructorOptions({
-                    instructorNames: data.map(instructor => ({ value: `${instructor.lastName} ${instructor.firstName}` })),
-                    instructorNamesandIDs: data.map(instructor => ({ id: instructor._id, name: `${instructor.lastName} ${instructor.firstName}` }))
-                })
-            } catch (error) {
-                console.log("Error searching for instructors", error)
-            }
-
-            setIsLoading(false)
-        }
-    }, 500)
-
-    const handleSelectLocation = selectedLocation => {
-        const chosenLocation = locationOptions.locationNamesandIDs.filter(locationOption => locationOption.name === selectedLocation)[0]
-
-        form.setFieldsValue({ location: chosenLocation.name, locationID: chosenLocation.id })
-    }
-
-    const handleSelectInstructor = selectedInstructor => {
-        const chosenInstructor = instructorOptions.instructorNamesandIDs.filter(instructorOption => instructorOption.name === selectedInstructor)[0]
-
-        form.setFieldsValue({ instructor: chosenInstructor.name, instructorID: chosenInstructor.id })
-    }
-
     const initialValues = vehicle ? {
         brand: vehicle.brand,
         model: vehicle.model,
@@ -143,9 +86,9 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
         licensePlate: vehicle.licensePlate,
         category: vehicle.category,
         ...(vehicle.transmission && { transmission: vehicle.transmission }),
-        ...(vehicle.schoolLocation && {
-            location: vehicle.schoolLocation.name,
-            locationID: vehicle.schoolLocation._id
+        ...(vehicle.location && {
+            location: vehicle.location.name,
+            locationID: vehicle.location._id
         }),
         ...(vehicle.instructor && {
             instructor: `${vehicle.instructor.firstName} ${vehicle.instructor.lastName}`,
@@ -246,11 +189,11 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 </Row>
                 <Row>
                     <Col span={11}>
-                        <Form.Item name="location" label="School location">
+                        <Form.Item name="location" label="Location">
                             <AutoComplete
                                 options={locationOptions.locationNames}
-                                onSearch={handleLocationSearch}
-                                onSelect={handleSelectLocation}>
+                                onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions)}
+                                onSelect={selectedLocation => handleSelectLocation(selectedLocation, locationOptions, form)}>
                                 <Input.Search loading={isLoading === 'locations'} />
                             </AutoComplete>
                         </Form.Item>
@@ -265,8 +208,8 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                         <Form.Item name="instructor" label="Instructor">
                             <AutoComplete
                                 options={instructorOptions.instructorNames}
-                                onSearch={handleInstructorSearch}
-                                onSelect={handleSelectInstructor}>
+                                onSearch={value => handleInstructorSearch(value, setIsLoading, auth, setInstructorOptions)}
+                                onSelect={selectedInstructor => handleSelectInstructor(selectedInstructor, instructorOptions, form)}>
                                 <Input.Search loading={isLoading === 'instructors'} />
                             </AutoComplete>
                         </Form.Item>

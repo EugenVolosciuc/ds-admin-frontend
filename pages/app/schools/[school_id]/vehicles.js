@@ -28,7 +28,7 @@ const VehiclesPage = () => {
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: {
-            school: user.school
+            school: user.school._id
         },
         sortBy,
         page,
@@ -95,11 +95,11 @@ const VehiclesPage = () => {
             sorter: true
         },
         {
-            title: 'School location',
-            dataIndex: 'schoolLocation',
-            key: 'schoolLocation',
+            title: 'Location',
+            dataIndex: 'location',
+            key: 'location',
             sorter: true,
-            render: schoolLocation => <span>{schoolLocation ? schoolLocation.name : '-'}</span>
+            render: location => <span>{location ? location.name : '-'}</span>
         },
         {
             title: 'Instructor',

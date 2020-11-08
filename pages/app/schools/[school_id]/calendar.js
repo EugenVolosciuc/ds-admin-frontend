@@ -9,17 +9,17 @@ import USER_ROLES from 'constants/USER_ROLES'
 
 
 const CalendarPage = () => {
-    const [isLoading, setIsLoading] = useState(false)
     const [location, setLocation] = useState(null)
 
     const { school, schoolLoading } = useContext(schoolContext)
     const { user, userLoading } = useContext(authContext)
 
     const singleLocation = school?.locations?.length === 1
-    const showPageHeaderExtra = schoolLoading && userLoading ? false : singleLocation && user?.role === USER_ROLES.SCHOOL_ADMIN.tag ? false : true
+    const isSchoolAdmin = user.role === USER_ROLES.SCHOOL_ADMIN.tag
+    const showPageHeaderExtra = !isSchoolAdmin && schoolLoading && userLoading ? false : singleLocation ? false : true
 
     const handleSelectLocation = selectedLocationID => {
-        setLocation(locations.find(location => location._id === selectedLocationID))
+        setLocation(school?.locations.find(location => location._id === selectedLocationID))
     }
 
     const pageHeaderExtra = (
@@ -31,7 +31,7 @@ const CalendarPage = () => {
     )
 
     useEffect(() => {
-        if (school && user.role === USER_ROLES.SCHOOL_ADMIN.tag) setLocation(school.locations[0])
+        if (school && isSchoolAdmin) setLocation(school.locations[0])
     }, [school])
 
     useEffect(() => {

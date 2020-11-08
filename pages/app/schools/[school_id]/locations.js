@@ -12,7 +12,7 @@ import fetcher from 'utils/functions/fetcher'
 import CreateEditUserModal from 'components/modals/CreateEditUserModal'
 import { authContext } from 'utils/hoc/withAuth'
 
-const SchoolLocationsPage = () => {
+const LocationsPage = () => {
     const [page, setPage] = useState(1)
     const [perPage, setPerPage] = useState(15)
     const [sortBy, setSortBy] = useState({})
@@ -23,7 +23,7 @@ const SchoolLocationsPage = () => {
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: { 
-            school: user.school
+            school: user.school._id
         },
         sortBy,
         page,
@@ -67,12 +67,12 @@ const SchoolLocationsPage = () => {
     ]
 
     return (
-        <DashboardLayout title="School Locations">
+        <DashboardLayout title="Locations">
             <Table
                 rowKey="_id"
                 loading={isValidating}
                 columns={columns}
-                dataSource={data?.schoollocations}
+                dataSource={data?.locations}
                 onChange={handleTableChange}
                 pagination={{
                     pageSize: perPage,
@@ -86,7 +86,7 @@ const SchoolLocationsPage = () => {
 }
 
 export default withAuth(
-    SchoolLocationsPage,
+    LocationsPage,
     [
         USER_ROLES.SUPER_ADMIN.tag,
         USER_ROLES.SCHOOL_ADMIN.tag,

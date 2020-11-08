@@ -12,6 +12,7 @@ import USER_ROLES from 'constants/USER_ROLES'
 import fetcher from 'utils/functions/fetcher'
 import CreateEditUserModal from 'components/modals/CreateEditUserModal'
 import { authContext } from 'utils/hoc/withAuth'
+import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
 
 const StudentsPage = () => {
     const [page, setPage] = useState(1)
@@ -22,12 +23,14 @@ const StudentsPage = () => {
 
     const { user, userLoading } = useContext(authContext)
 
+    const userIsInstructor = user.role === USER_ROLES.INSTRUCTOR.tag
     const url = '/users'
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: {
-            school: user.school,
-            role: USER_ROLES.STUDENT.tag
+            school: user.school._id,
+            role: USER_ROLES.STUDENT.tag,
+            ...(userIsInstructor && { instructor: user._id })
         },
         sortBy,
         page,
@@ -127,10 +130,12 @@ const StudentsPage = () => {
         }
     ]
 
-    const pageHeaderExtra = (
+    const pageHeaderExtra = renderRoleBasedContent(
         <Button size="middle" type="primary" onClick={toggleCreateUserModal}>
             Register student
-        </Button>
+        </Button>,
+        { [USER_ROLES.INSTRUCTOR.tag]: null },
+        user.role
     )
 
     return (
@@ -173,6 +178,7 @@ export default withAuth(
     [
         USER_ROLES.SUPER_ADMIN.tag,
         USER_ROLES.SCHOOL_ADMIN.tag,
-        USER_ROLES.LOCATION_ADMIN.tag
+        USER_ROLES.LOCATION_ADMIN.tag,
+        USER_ROLES.INSTRUCTOR.tag
     ]
 )

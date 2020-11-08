@@ -26,7 +26,7 @@ const InstructorsPage = () => {
 
     const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: { 
-            school: user.school,
+            school: user.school._id,
             role: USER_ROLES.INSTRUCTOR.tag
         },
         sortBy,

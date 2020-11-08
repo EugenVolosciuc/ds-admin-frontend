@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Card } from 'antd'
+import { Card, message } from 'antd'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import useSWR from 'swr'
@@ -12,16 +12,10 @@ import nameShortener from 'utils/functions/nameShortener'
 
 const localizer = momentLocalizer(moment)
 
-const exampleEvent = {
-    title: "My first lesson",
-    start: moment().subtract(1.5, 'hours').toDate(),
-    end: moment().toDate(),
-    // allDay: boolean,
-    // resource: any,
-}
+const CALENDAR_STEP = 30
 
 const LessonCalendar = ({ location }) => {
-    const [showCreateLessonModal, setShowCreateLessonModal] = useState(false) // can be true, false or slotInfo
+    const [showCreateLessonModal, setShowCreateLessonModal] = useState(false) // can be true, false or range
     const [showUpdateLessonModal, setShowUpdateLessonModal] = useState(null)
     const [calendarRangeStart, setCalendarRangeStart] = useState(moment().toDate())
     const [view, setView] = useState('week')
@@ -37,7 +31,7 @@ const LessonCalendar = ({ location }) => {
             location: location?._id
         }
     }))
-
+    
     const toggleCreateLessonModal = () => setShowCreateLessonModal(!showCreateLessonModal)
 
     const toggleUpdateLessonModal = id => {
@@ -46,7 +40,28 @@ const LessonCalendar = ({ location }) => {
         return setShowUpdateLessonModal(null)
     }
 
-    const handleSelectSlot = slotInfo => setShowCreateLessonModal(slotInfo)
+    const handleSelectSlot = range => {
+        // Only instructors are prohibited to schedule lessons at the same time
+        if (user.role === USER_ROLES.INSTRUCTOR.tag) {
+            // Only check if lesson exists in selection if the selection > calendar step
+            const selectionIsBiggerThanCalendarStep = moment.duration(moment(range.end).diff(moment(range.start))).asMinutes() > CALENDAR_STEP
+
+            if (selectionIsBiggerThanCalendarStep) {
+                const twoLessonsAtTheSameTime = data.some(lesson => {
+                    if (moment(lesson.start).isSame(range.start, 'day')) {
+                        return moment(lesson.start).isAfter(range.start) && moment(lesson.start).isBefore(range.end)
+                    }
+
+                    return false
+                })
+
+                if (twoLessonsAtTheSameTime) return message.warn("You can't have two lessons at the same time")
+            }
+        }
+
+        setShowCreateLessonModal(range)
+    }
+
     const handleSelectEvent = event => setShowUpdateLessonModal(event.resource)
     const handleRangeChange = range => setCalendarRangeStart(range[0])
     const handleNavigate = navigatedDate => setCalendarRangeStart(navigatedDate)
@@ -121,7 +136,8 @@ const LessonCalendar = ({ location }) => {
                 date={calendarRangeStart}
                 views={['day', 'week']}
                 selectable={true}
-                onSelectSlot={handleSelectSlot} // TODO: replace this with onSelecting, so that I can return false when an overlapping selection is made
+                step={CALENDAR_STEP}
+                onSelectSlot={handleSelectSlot}
                 onRangeChange={handleRangeChange}
                 onNavigate={handleNavigate}
                 onView={handleViewChange}

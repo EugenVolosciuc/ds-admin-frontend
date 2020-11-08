@@ -16,7 +16,7 @@ const ProvideSchool = ({ children }) => {
             try {
                 setIsLoading(true)
                 if (auth.user?.school) {
-                    const { data } = await axios.get(`/schools/${auth.user.school}`)
+                    const { data } = await axios.get(`/schools/${auth.user.school._id}`)
 
                     setSchool(data)
                     setIsLoading(false)

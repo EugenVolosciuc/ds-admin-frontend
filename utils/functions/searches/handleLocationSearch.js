@@ -1,0 +1,27 @@
+import debounce from 'lodash/debounce'
+import axios from 'axios'
+
+const handleLocationSearch = debounce(async (value, setIsLoading, auth, setLocationOptions) => {
+    if (value.length > 2) {
+        try {
+            setIsLoading('locations')
+            const { data } = await axios.get('/school-locations/search', {
+                params: {
+                    search: { name: value },
+                    school: auth.user.school._id
+                }
+            })
+
+            setLocationOptions({
+                locationNames: data.map(location => ({ value: location.name })),
+                locationNamesandIDs: data.map(location => ({ id: location._id, name: location.name }))
+            })
+        } catch (error) {
+            console.log("Error searching for locations", error)
+        }
+
+        setIsLoading(false)
+    }
+}, 500)
+
+export default handleLocationSearch

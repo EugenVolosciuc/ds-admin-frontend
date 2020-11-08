@@ -5,6 +5,7 @@ import React, { useState, useEffect, useContext, createContext } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import cookies from 'next-cookies'
+import USER_ROLES from 'constants/USER_ROLES'
 
 export const authContext = createContext({ user: null, userLoading: false })
 const isBrowser = typeof window !== 'undefined'
@@ -15,9 +16,9 @@ export const ProvideAuth = ({ children }) => {
 }
 
 // authOption: false | userRole | userRole[]
-    // false - user shouldn't see the page if false
-    // undefined - user should be logged in to see the page, regardless of the user role
-    // userRole - string or array of strings of user role that can see the page
+// false - user shouldn't see the page if false
+// undefined - user should be logged in to see the page, regardless of the user role
+// userRole - string or array of strings of user role that can see the page
 export const withAuth = (Component, authOption) => {
     const WithAuthWrapper = props => {
         const router = useRouter()
@@ -42,15 +43,15 @@ export const withAuth = (Component, authOption) => {
                         if (authOption !== user.role) return true
                     }
                 }
-    
+
                 return false
             }
-    
+
             if (isBrowser && needRedirect()) {
                 router.push('/', '/')
                 return <></>
             }
-    
+
             return <Component {...props} />
         }
 
@@ -83,6 +84,36 @@ const useProvideAuth = () => {
     const [userLoading, setUserLoading] = useState(false)
     const router = useRouter()
 
+    const redirectURLs = loggedUser => {
+        switch (loggedUser.role) {
+            case USER_ROLES.SUPER_ADMIN.tag:
+                return {
+                    href: '/app/admin',
+                    as: '/app/admin'
+                }
+            case USER_ROLES.SCHOOL_ADMIN.tag:
+                return {
+                    href: '/app/schools/[school_id]',
+                    as: `/app/schools/${loggedUser.school._id}`
+                }
+            case USER_ROLES.LOCATION_ADMIN.tag:
+                return {
+                    href: `/app/schools/${null}`,
+                    as: `/app/schools/${loggedUser.school._id}`
+                }
+            case USER_ROLES.INSTRUCTOR.tag:
+                return {
+                    href: '/app/schools/[school_id/calendar',
+                    as: `/app/schools/${loggedUser.school._id}/calendar`
+                }
+            case USER_ROLES.STUDENT.tag:
+                return {
+                    href: '/app/schools/[school_id]/calendar',
+                    as: `/app/schools/${loggedUser.school._id}/calendar`
+                }
+        }
+    }
+
     // Login method
     const login = async values => {
         try {
@@ -90,7 +121,9 @@ const useProvideAuth = () => {
             const { data } = await axios.post('/users/login', values)
             setUser(data)
             setUserLoading(false)
-            router.push('/app/admin', '/app/admin')
+
+            const urls = redirectURLs(data)
+            router.push(urls.href, urls.as)
         } catch (error) {
             setUserLoading(false)
             console.log(error)
@@ -120,6 +153,9 @@ const useProvideAuth = () => {
             const { data } = await axios.get('/users/me')
             setUser(data)
             setUserLoading(false)
+
+            const urls = redirectURLs(data)
+            router.push(urls.href, urls.as)
         } catch (error) {
             console.log("ERROR CHECKING AUTH", error)
             setUser(null)
