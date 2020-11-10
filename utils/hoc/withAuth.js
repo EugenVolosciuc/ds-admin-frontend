@@ -5,6 +5,8 @@ import React, { useState, useEffect, useContext, createContext } from 'react'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import cookies from 'next-cookies'
+
+import errorHandler from 'utils/functions/errorHandler'
 import USER_ROLES from 'constants/USER_ROLES'
 
 export const authContext = createContext({ user: null, userLoading: false })
@@ -126,7 +128,7 @@ const useProvideAuth = () => {
             router.push(urls.href, urls.as)
         } catch (error) {
             setUserLoading(false)
-            console.log(error)
+            errorHandler(error)
         }
     }
 

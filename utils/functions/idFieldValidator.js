@@ -1,8 +1,11 @@
-const idFieldValidator = (getFieldValue, nameField, idField, options) => ({
+import isEmpty from 'lodash/isEmpty'
+
+const idFieldValidator = (getFieldValue, nameField, idField, options, initialValues) => ({
     validator(rule, value) {
         const ids = options.map(option => option.id)
+        const isUpdateModal = !isEmpty(initialValues)
 
-        if (ids.includes(getFieldValue(idField))) {
+        if (isUpdateModal ? value === initialValues[nameField] || ids.includes(getFieldValue(idField)) :  ids.includes(getFieldValue(idField))) {
             return Promise.resolve()
         }
 

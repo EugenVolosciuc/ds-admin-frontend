@@ -46,11 +46,25 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
     const handleCreateLesson = async values => {
         setIsLoading('create')
         try {
-            await axios.post('/lessons', getDataToSend(values))
+            const lesson = await axios.post('/lessons', getDataToSend(values))
             setIsLoading(false)
             onCancel()
             message.success('Lesson created')
-            await mutate('/lessons', data => ({ ...data, values }), true) // TODO: not working!
+            await mutate('/lessons', data => ({ ...data, lesson }), true) // TODO: not working!
+        } catch (error) {
+            setIsLoading(false)
+            errorHandler(error, form)
+        }
+    }
+
+    const handleUpdateLesson = async values => {
+        setIsLoading('update')
+        try {
+            const newLesson = await axios.patch(`/lessons/${lesson._id}`, getDataToSend(values))
+            setIsLoading(false)
+            onCancel()
+            message.success('Lesson modified')
+            await mutate('/lessons', data => ({ ...data, newLesson }), true)
         } catch (error) {
             setIsLoading(false)
             errorHandler(error, form)
@@ -85,7 +99,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
             label="Student"
             rules={[
                 { required: true, message: "Student is required" },
-                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'student', 'studentID', studentOptions.studentNamesandIDs)
+                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'student', 'studentID', studentOptions.studentNamesandIDs, initialValues)
             ]}
         >
             <AutoComplete
@@ -127,6 +141,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                 layout="vertical"
                 name="lessonForm"
                 initialValues={initialValues}
+                validateTrigger="onBlur"
             >
                 <Row>
                     <Col span={24}>
@@ -156,7 +171,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                                     label="Instructor" 
                                     rules={[
                                         { required: true, message: "Instructor is required" },
-                                        ({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs)
+                                        ({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs, initialValues)
                                     ]}
                                 >
                                     <AutoComplete
@@ -184,7 +199,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                             label="Vehicle" 
                             rules={[
                                 { required: true, message: "Vehicle is required" },
-                                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs)
+                                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs, initialValues)
                             ]}
                         >
                             <AutoComplete
@@ -220,7 +235,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                                 label="Location" 
                                 rules={[
                                     { required: true, message: "Location is required" },
-                                    ({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs)
+                                    ({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs, initialValues)
                                 ]}
                             >
                                 <AutoComplete

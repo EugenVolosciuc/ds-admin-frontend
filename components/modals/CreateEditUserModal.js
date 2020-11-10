@@ -125,7 +125,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
         <Form.Item
             name="instructor"
             label="Instructor"
-            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs)]}
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs, initialValues)]}
         >
             <AutoComplete
                 options={instructorOptions.instructorNames}
@@ -147,7 +147,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
         <Form.Item
             name="vehicle"
             label="Vehicle"
-            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs)]}
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs, initialValues)]}
         >
             <AutoComplete
                 options={vehicleOptions.vehicleNames}
@@ -168,7 +168,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
         <Form.Item
             name="location"
             label="Location"
-            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs)]}
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs, initialValues)]}
         >
             <AutoComplete
                 options={locationOptions.locationNames}
