@@ -1,6 +1,7 @@
 import React from 'react'
 
 import DashboardLayout from 'components/layouts/DashboardLayout/DashboardLayout.js'
+import { withAuth } from 'utils/hoc/withAuth'
 
 const SchoolPage = () => {
     return (
@@ -10,4 +11,4 @@ const SchoolPage = () => {
     )
 }
 
-export default SchoolPage
+export default withAuth(SchoolPage)

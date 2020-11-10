@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 import axios from 'axios'
 
-const handleLocationSearch = debounce(async (value, setIsLoading, auth, setLocationOptions) => {
+const handleLocationSearch = debounce(async (value, setIsLoading, auth, setLocationOptions, form) => {
     if (value.length > 2) {
         try {
             setIsLoading('locations')
@@ -16,6 +16,8 @@ const handleLocationSearch = debounce(async (value, setIsLoading, auth, setLocat
                 locationNames: data.map(location => ({ value: location.name })),
                 locationNamesandIDs: data.map(location => ({ id: location._id, name: location.name }))
             })
+
+            form.setFieldsValue({ locationID: undefined })
         } catch (error) {
             console.log("Error searching for locations", error)
         }

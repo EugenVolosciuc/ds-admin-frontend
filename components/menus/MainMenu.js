@@ -5,6 +5,7 @@ import SuperAdminMenu from 'components/menus/SuperAdminMenu'
 import SchoolAdminMenu from 'components/menus/SchoolAdminMenu'
 import InstructorMenu from 'components/menus/InstructorMenu'
 import StudentMenu from 'components/menus/StudentMenu'
+import LocationAdminMenu from 'components/menus/LocationAdminMenu'
 import USER_ROLES from 'constants/USER_ROLES'
 
 const MainMenu = () => {
@@ -18,6 +19,8 @@ const MainMenu = () => {
                 return <SchoolAdminMenu />
             case USER_ROLES.INSTRUCTOR.tag:
                 return <InstructorMenu />
+            case USER_ROLES.LOCATION_ADMIN.tag:
+                return <LocationAdminMenu />
             case USER_ROLES.STUDENT.tag:
                 return <StudentMenu />
             default:

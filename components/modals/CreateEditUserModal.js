@@ -6,6 +6,8 @@ import { mutate } from 'swr'
 import USER_ROLES from 'constants/USER_ROLES'
 import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
 import { authContext } from 'utils/hoc/withAuth'
+import errorHandler from 'utils/functions/errorHandler'
+import idFieldValidator from 'utils/functions/idFieldValidator'
 import handleStudentSearch from 'utils/functions/searches/handleStudentSearch'
 import handleInstructorSearch from 'utils/functions/searches/handleInstructorSearch'
 import handleVehicleSearch from 'utils/functions/searches/handleVehicleSearch'
@@ -57,7 +59,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
             await mutate('/users', data => ({ ...data, values }), true) // TODO: not working!
         } catch (error) {
             setIsLoading(false)
-            console.log("Error creating user", error)
+            errorHandler(error, form)
         }
     }
 
@@ -72,7 +74,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
             await mutate('/users', data => ({ ...data, values }), true) // TODO: not working! IDEA: instead of values, why not add what I have from the request response?
         } catch (error) {
             setIsLoading(false)
-            console.log("Error updating user", error)
+            errorHandler(error, form)
         }
     }
 
@@ -120,7 +122,11 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
     </>)
 
     const instructorSearchBar = (<>
-        <Form.Item name="instructor" label="Instructor">
+        <Form.Item
+            name="instructor"
+            label="Instructor"
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs)]}
+        >
             <AutoComplete
                 options={instructorOptions.instructorNames}
                 onSearch={value => handleInstructorSearch(value, setIsLoading, auth, setInstructorOptions)}
@@ -138,7 +144,11 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
 
     const vehicleSearchBar = (<>
         {/* TODO: add an info icon to tell the user that the search works only by brand atm */}
-        <Form.Item name="vehicle" label="Vehicle">
+        <Form.Item
+            name="vehicle"
+            label="Vehicle"
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs)]}
+        >
             <AutoComplete
                 options={vehicleOptions.vehicleNames}
                 onSearch={value => handleVehicleSearch(value, setIsLoading, auth, setVehicleOptions)}
@@ -155,7 +165,11 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
     </>)
 
     const locationSearchBar = (<>
-        <Form.Item name="location" label="Location">
+        <Form.Item
+            name="location"
+            label="Location"
+            rules={[({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs)]}
+        >
             <AutoComplete
                 options={locationOptions.locationNames}
                 onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions)}

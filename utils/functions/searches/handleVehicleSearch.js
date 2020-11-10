@@ -1,7 +1,7 @@
 import debounce from 'lodash/debounce'
 import axios from 'axios'
 
-const handleVehicleSearch = debounce(async (value, setIsLoading, auth, setVehicleOptions) => {
+const handleVehicleSearch = debounce(async (value, setIsLoading, auth, setVehicleOptions, form) => {
     if (value.length > 2) {
         try {
             setIsLoading('vehicles')
@@ -17,6 +17,8 @@ const handleVehicleSearch = debounce(async (value, setIsLoading, auth, setVehicl
                 vehicleNames: data.map(vehicle => ({ value: `${vehicle.brand} ${vehicle.model}` })),
                 vehicleNamesandIDs: data.map(vehicle => ({ id: vehicle._id, name: `${vehicle.brand} ${vehicle.model}` }))
             })
+
+            form.setFieldsValue({ vehicleID: undefined })
         } catch (error) {
             console.log("Error searching for vehicles", error)
         }

@@ -8,6 +8,8 @@ import axios from 'axios'
 import USER_ROLES from 'constants/USER_ROLES'
 import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
 import { authContext } from 'utils/hoc/withAuth'
+import errorHandler from 'utils/functions/errorHandler'
+import idFieldValidator from 'utils/functions/idFieldValidator'
 import handleVehicleSearch from 'utils/functions/searches/handleVehicleSearch'
 import handleLocationSearch from 'utils/functions/searches/handleLocationSearch'
 import handleStudentSearch from 'utils/functions/searches/handleStudentSearch'
@@ -51,7 +53,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
             await mutate('/lessons', data => ({ ...data, values }), true) // TODO: not working!
         } catch (error) {
             setIsLoading(false)
-            console.log("Error creating user", error)
+            errorHandler(error, form)
         }
     }
 
@@ -78,10 +80,17 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
             : {}
 
     const studentSearchBar = (<>
-        <Form.Item name="student" label="Student" rules={[{ required: true, message: "Student is required" }]}>
+        <Form.Item
+            name="student"
+            label="Student"
+            rules={[
+                { required: true, message: "Student is required" },
+                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'student', 'studentID', studentOptions.studentNamesandIDs)
+            ]}
+        >
             <AutoComplete
                 options={studentOptions.studentNames}
-                onSearch={value => handleStudentSearch(value, setIsLoading, auth, setStudentOptions)}
+                onSearch={value => handleStudentSearch(value, setIsLoading, auth, setStudentOptions, form)}
                 onSelect={selectedStudent => handleSelectStudent(selectedStudent, studentOptions, form)}>
                 <Input.Search loading={isLoading === 'students'} />
             </AutoComplete>
@@ -142,10 +151,17 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                     <Col span={11}>
                         {renderRoleBasedContent(
                             <>
-                                <Form.Item name="instructor" label="Instructor" rules={[{ required: true, message: "Instructor is required" }]}>
+                                <Form.Item 
+                                    name="instructor" 
+                                    label="Instructor" 
+                                    rules={[
+                                        { required: true, message: "Instructor is required" },
+                                        ({ getFieldValue }) => idFieldValidator(getFieldValue, 'instructor', 'instructorID', instructorOptions.instructorNamesandIDs)
+                                    ]}
+                                >
                                     <AutoComplete
                                         options={instructorOptions.instructorNames}
-                                        onSearch={value => handleInstructorSearch(value, setIsLoading, auth, setInstructorOptions)}
+                                        onSearch={value => handleInstructorSearch(value, setIsLoading, auth, setInstructorOptions, form)}
                                         onSelect={selectedInstructor => handleSelectInstructor(selectedInstructor, instructorOptions, form)}>
                                         <Input.Search loading={isLoading === 'instructors'} />
                                     </AutoComplete>
@@ -163,10 +179,17 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                     </Col>
                     <Col span={11} offset={2}>
                         {/* TODO: add an info icon to tell the user that the search works only by brand atm */}
-                        <Form.Item name="vehicle" label="Vehicle" rules={[{ required: true, message: "Vehicle is required" }]}>
+                        <Form.Item 
+                            name="vehicle" 
+                            label="Vehicle" 
+                            rules={[
+                                { required: true, message: "Vehicle is required" },
+                                ({ getFieldValue }) => idFieldValidator(getFieldValue, 'vehicle', 'vehicleID', vehicleOptions.vehicleNamesandIDs)
+                            ]}
+                        >
                             <AutoComplete
                                 options={vehicleOptions.vehicleNames}
-                                onSearch={value => handleVehicleSearch(value, setIsLoading, auth, setVehicleOptions)}
+                                onSearch={value => handleVehicleSearch(value, setIsLoading, auth, setVehicleOptions, form)}
                                 onSelect={selectedVehicle => handleSelectVehicle(selectedVehicle, vehicleOptions, form)}>
                                 <Input.Search loading={isLoading === 'vehicles'} />
                             </AutoComplete>
@@ -192,10 +215,17 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
                     </Col>
                     {auth.user.role === USER_ROLES.SCHOOL_ADMIN.tag &&
                         <Col span={11} offset={2}>
-                            <Form.Item name="location" label="Location" rules={[{ required: true, message: "Location is required" }]}>
+                            <Form.Item 
+                                name="location" 
+                                label="Location" 
+                                rules={[
+                                    { required: true, message: "Location is required" },
+                                    ({ getFieldValue }) => idFieldValidator(getFieldValue, 'location', 'locationID', locationOptions.locationNamesandIDs)
+                                ]}
+                            >
                                 <AutoComplete
                                     options={locationOptions.locationNames}
-                                    onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions)}
+                                    onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions, form)}
                                     onSelect={selectedLocation => handleSelectLocation(selectedLocation, locationOptions, form)}>
                                     <Input.Search loading={isLoading === 'locations'} />
                                 </AutoComplete>

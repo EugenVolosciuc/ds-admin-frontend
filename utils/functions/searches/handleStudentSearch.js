@@ -3,7 +3,7 @@ import axios from 'axios'
 
 import USER_ROLES from 'constants/USER_ROLES'
 
-const handleStudentSearch = debounce(async (value, setIsLoading, auth, setStudentOptions) => {
+const handleStudentSearch = debounce(async (value, setIsLoading, auth, setStudentOptions, form) => {
     if (value.length > 2) {
         try {
             setIsLoading('students')
@@ -19,6 +19,8 @@ const handleStudentSearch = debounce(async (value, setIsLoading, auth, setStuden
                 studentNames: data.map(student => ({ value: `${student.lastName} ${student.firstName}` })),
                 studentNamesandIDs: data.map(student => ({ id: student._id, name: `${student.lastName} ${student.firstName}` }))
             })
+
+            form.setFieldsValue({ studentID: undefined })
         } catch (error) {
             console.log("Error searching for students", error)
         }

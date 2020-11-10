@@ -13,7 +13,7 @@ import { useRouter } from 'next/router'
 import { Link } from 'i18n'
 import { authContext } from 'utils/hoc/withAuth'
 
-const SuperAdminMenu = () => {
+const SchoolAdminMenu = () => {
     const router = useRouter()
 
     const { user } = useContext(authContext)
@@ -42,4 +42,4 @@ const SuperAdminMenu = () => {
     )
 }
 
-export default SuperAdminMenu
+export default SchoolAdminMenu
