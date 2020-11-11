@@ -8,6 +8,7 @@ import TRANSMISSION_TYPES from 'constants/TRANSMISSION_TYPES'
 import VEHICLE_STATUSES from 'constants/VEHICLE_STATUSES'
 import VEHICLE_CATEGORIES from 'constants/VEHICLE_CATEGORIES'
 import { authContext } from 'utils/hoc/withAuth'
+import { schoolContext } from 'utils/contexts/schoolContext'
 import handleLocationSearch from 'utils/functions/searches/handleLocationSearch'
 import handleInstructorSearch from 'utils/functions/searches/handleInstructorSearch'
 import handleSelectInstructor from 'utils/functions/selectors/handleSelectInstructor'
@@ -17,11 +18,14 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const [isLoading, setIsLoading] = useState(false)
     const [locationOptions, setLocationOptions] = useState({ locationNames: [], locationNamesandIDs: [] })
     const [instructorOptions, setInstructorOptions] = useState({ instructorNames: [], instructorNamesandIDs: [] })
-    const isUpdateModal = !!vehicle
+
+    const auth = useContext(authContext)
+    const { school } = useContext(schoolContext)
 
     const [form] = Form.useForm()
 
-    const auth = useContext(authContext)
+    const isUpdateModal = !!vehicle
+    const singleLocation = school?.locations?.length === 1
 
     const getDataToSend = values => {
         const { brand, category, instructorID, licensePlate, locationID, model, modelYear, transmission } = values
@@ -31,7 +35,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             category,
             instructor: instructorID,
             licensePlate,
-            location: locationID,
+            location: singleLocation ? school.locations[0] : locationID,
             model,
             transmission,
             modelYear: moment(modelYear).format('YYYY')
@@ -69,7 +73,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const handleOutOfUseVehicle = async () => {
         setIsLoading('out of use')
         try {
-            await axios.patch(`/vehicles/${vehicle._id}`, { status: VEHICLE_STATUSES.INOPERATIVE.tag})
+            await axios.patch(`/vehicles/${vehicle._id}`, { status: VEHICLE_STATUSES.INOPERATIVE.tag })
             setIsLoading(false)
             onCancel()
             message.success('Vehicle set out of use')
@@ -188,23 +192,25 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={11}>
-                        <Form.Item name="location" label="Location">
-                            <AutoComplete
-                                options={locationOptions.locationNames}
-                                onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions)}
-                                onSelect={selectedLocation => handleSelectLocation(selectedLocation, locationOptions, form)}>
-                                <Input.Search loading={isLoading === 'locations'} />
-                            </AutoComplete>
-                        </Form.Item>
-                        <Form.Item
-                            hidden
-                            name="locationID"
-                        >
-                            <Input hidden />
-                        </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
+                    {!singleLocation &&
+                        <Col span={11}>
+                            <Form.Item name="location" label="Location">
+                                <AutoComplete
+                                    options={locationOptions.locationNames}
+                                    onSearch={value => handleLocationSearch(value, setIsLoading, auth, setLocationOptions)}
+                                    onSelect={selectedLocation => handleSelectLocation(selectedLocation, locationOptions, form)}>
+                                    <Input.Search loading={isLoading === 'locations'} />
+                                </AutoComplete>
+                            </Form.Item>
+                            <Form.Item
+                                hidden
+                                name="locationID"
+                            >
+                                <Input hidden />
+                            </Form.Item>
+                        </Col>
+                    }
+                    <Col span={11} offset={singleLocation ? 0 : 2}>
                         <Form.Item name="instructor" label="Instructor">
                             <AutoComplete
                                 options={instructorOptions.instructorNames}

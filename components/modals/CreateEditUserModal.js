@@ -6,6 +6,7 @@ import { mutate } from 'swr'
 import USER_ROLES from 'constants/USER_ROLES'
 import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
 import { authContext } from 'utils/hoc/withAuth'
+import { schoolContext } from 'utils/contexts/schoolContext'
 import errorHandler from 'utils/functions/errorHandler'
 import idFieldValidator from 'utils/functions/idFieldValidator'
 import handleStudentSearch from 'utils/functions/searches/handleStudentSearch'
@@ -28,7 +29,9 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
     const [locationOptions, setLocationOptions] = useState({ locationNames: [], locationNamesandIDs: [] })
 
     const auth = useContext(authContext)
+    const { school } = useContext(schoolContext)
 
+    const singleLocation = school?.locations?.length === 1
     const isUpdateModal = !!user
 
     const [form] = Form.useForm()
@@ -45,7 +48,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
             ...(locationID && { location: locationID }),
             ...(vehicleID && { vehicle: vehicleID }),
             ...(studentID && { student: studentID }),
-            ...(instructorID && { instructor: instructorID }),
+            ...(instructorID && { instructor: singleLocation ? school.locations[0] : instructorID }),
         }
     }
 
@@ -190,13 +193,13 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
             case USER_ROLES.SCHOOL_ADMIN.tag:
                 return <>
                     <Row>
-                        <Col span={11}>
+                        <Col span={11}>{vehicleSearchBar}</Col>
+                        <Col span={11} offset={2}>
                             {userRole.tag === USER_ROLES.STUDENT.tag && instructorSearchBar}
-                            {userRole.tag === USER_ROLES.INSTRUCTOR.tag && locationSearchBar}
+                            {userRole.tag === USER_ROLES.INSTRUCTOR.tag && !singleLocation && locationSearchBar}
                         </Col>
-                        <Col span={11} offset={2}>{vehicleSearchBar}</Col>
                     </Row>
-                    {userRole.tag === USER_ROLES.STUDENT.tag &&
+                    {userRole.tag === USER_ROLES.STUDENT.tag && !singleLocation &&
                         <Row>
                             <Col span={24}>{locationSearchBar}</Col>
                         </Row>
@@ -204,11 +207,11 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
                 </>
             case USER_ROLES.LOCATION_ADMIN.tag:
                 return <Row>
-                    <Col span={11}>
+                    <Col span={11}>{vehicleSearchBar}</Col>
+                    <Col span={11} offset={2}>
                         {userRole.tag === USER_ROLES.STUDENT.tag && instructorSearchBar}
                         {userRole.tag === USER_ROLES.INSTRUCTOR.tag && studentSearchBar}
                     </Col>
-                    <Col span={11} offset={2}>{vehicleSearchBar}</Col>
                 </Row>
             default:
                 return null

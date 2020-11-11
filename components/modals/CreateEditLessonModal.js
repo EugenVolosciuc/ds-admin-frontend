@@ -8,6 +8,7 @@ import axios from 'axios'
 import USER_ROLES from 'constants/USER_ROLES'
 import renderRoleBasedContent from 'utils/functions/renderRoleBasedContent'
 import { authContext } from 'utils/hoc/withAuth'
+import { schoolContext } from 'utils/contexts/schoolContext'
 import errorHandler from 'utils/functions/errorHandler'
 import idFieldValidator from 'utils/functions/idFieldValidator'
 import handleVehicleSearch from 'utils/functions/searches/handleVehicleSearch'
@@ -28,7 +29,9 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
 
     const [form] = Form.useForm()
     const auth = useContext(authContext)
+    const { school } = useContext(schoolContext)
 
+    const singleLocation = school?.locations?.length === 1
     const isUpdateModal = !!lesson
     const isStudent = auth.user.role === USER_ROLES.STUDENT.tag
     const createLessonRequest = !lesson && isStudent
@@ -50,7 +53,7 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
         vehicle: values.vehicleID,
         ...(values.student && { student: values.studentID }),
         ...(values.instructor && { instructor: values.instructorID }),
-        ...(values.location && { location: values.locationID })
+        ...(values.location && { location: singleLocation ? school.locations[0] : values.locationID })
     })
 
     const handleCreateLesson = async values => {
@@ -266,7 +269,7 @@ const modalFooter = (
                             auth.user.role
                         )}
                     </Col>
-                    {auth.user.role === USER_ROLES.SCHOOL_ADMIN.tag &&
+                    {auth.user.role === USER_ROLES.SCHOOL_ADMIN.tag && !singleLocation &&
                         <Col span={11} offset={2}>
                             <Form.Item 
                                 name="location" 
