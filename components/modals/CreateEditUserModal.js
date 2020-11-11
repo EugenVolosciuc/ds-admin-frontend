@@ -221,7 +221,7 @@ const CreateEditUserModal = ({ visible, onCancel, user, userRole }) => {
             visible={visible}
             title={<span className="bold">{modalTitle}</span>}
             onCancel={() => onCancel()}
-            cancelText="Cancel"
+            cancelText="Close"
             okText={modalTitle}
             okButtonProps={{ loading: isLoading }}
             onOk={() => {

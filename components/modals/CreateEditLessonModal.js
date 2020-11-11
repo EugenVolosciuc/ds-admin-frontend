@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Modal, Form, TimePicker, DatePicker, Input, AutoComplete, Row, Col, message } from 'antd'
+import { Modal, Form, TimePicker, DatePicker, Input, AutoComplete, Row, Col, Popconfirm, Button, message } from 'antd'
 import { mutate } from 'swr'
 import isObject from 'lodash/isObject'
 import moment from 'moment'
@@ -26,13 +26,23 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
     const [vehicleOptions, setVehicleOptions] = useState({ vehicleNames: [], vehicleNamesandIDs: [] })
     const [locationOptions, setLocationOptions] = useState({ locationNames: [], locationNamesandIDs: [] })
 
-    const isUpdateModal = !!lesson
-    const visibleIsRange = isObject(visible)
-    const timeFormat = 'HH:mm'
-    const modalTitle = isUpdateModal ? 'Update lesson' : 'Schedule lesson'
-
     const [form] = Form.useForm()
     const auth = useContext(authContext)
+
+    const isUpdateModal = !!lesson
+    const isStudent = auth.user.role === USER_ROLES.STUDENT.tag
+    const createLessonRequest = !lesson && isStudent
+    const viewMode = isStudent && isUpdateModal
+    const visibleIsRange = isObject(visible)
+    const timeFormat = 'HH:mm'
+
+    const modalTitle = isStudent 
+        ? isUpdateModal 
+            ? 'Lesson details'
+            : 'Send lesson request'
+        : isUpdateModal 
+            ? 'Update lesson'
+            : 'Schedule lesson'
 
     const getDataToSend = values => ({
         start: `${moment(values.date).format('YYYY-MM-DD')} ${moment(values.start).format('HH:mm')}`,
@@ -45,12 +55,14 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
 
     const handleCreateLesson = async values => {
         setIsLoading('create')
+        const url = createLessonRequest ? '/lesson-requests' : '/lessons'
+
         try {
-            const lesson = await axios.post('/lessons', getDataToSend(values))
+            const lesson = await axios.post(url, getDataToSend(values))
             setIsLoading(false)
             onCancel()
-            message.success('Lesson created')
-            await mutate('/lessons', data => ({ ...data, lesson }), true) // TODO: not working!
+            message.success(`Lesson ${createLessonRequest ? 'request sent' : 'created'}`)
+            await mutate(url, data => ({ ...data, lesson }), true) // TODO: not working!
         } catch (error) {
             setIsLoading(false)
             errorHandler(error, form)
@@ -68,6 +80,19 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
         } catch (error) {
             setIsLoading(false)
             errorHandler(error, form)
+        }
+    }
+
+    const handleDeleteLesson = async () => {
+        setIsLoading('delete')
+        try {
+            await axios.delete(`/lessons/${lesson._id}`)
+            setIsLoading(false)
+            onCancel()
+            message.success('Lesson deleted')
+        } catch (error) {
+            setIsLoading(false)
+            errorHandler(error)
         }
     }
 
@@ -117,24 +142,37 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
         </Form.Item>
     </>)
 
+const modalFooter = (
+    <Row justify={isUpdateModal ? "space-between" : "end"}>
+        {isUpdateModal &&
+            <Col span={8}>
+                <Row align="middle" justify="start">
+                    <Popconfirm title="Are you sure you want to cancel this lesson?" onConfirm={handleDeleteLesson} okButtonProps={{ danger: true }}>
+                        <Button danger loading={isLoading === 'delete'}>Cancel lesson</Button>
+                    </Popconfirm>
+                </Row>
+            </Col>
+        }
+        <Col span={16}>
+            <Button onClick={() => onCancel()}>Close</Button>
+            <Button
+                onClick={() => form.validateFields().then(values => isUpdateModal ? handleUpdateLesson(values) : handleCreateLesson(values))}
+                loading={isLoading === 'update' || isLoading === 'create'}
+                type="primary"
+            >
+                {modalTitle}
+            </Button>
+        </Col>
+    </Row>
+)
+
     return (
         <Modal
             destroyOnClose
             visible={visible}
             title={<span className="bold">{modalTitle}</span>}
             onCancel={() => onCancel()}
-            cancelText="Cancel"
-            okText={modalTitle}
-            okButtonProps={{ loading: isUpdateModal ? isLoading === 'update' : isLoading === 'create' }}
-            onOk={() => {
-                form.validateFields()
-                    .then(values => {
-                        isUpdateModal ? handleUpdateLesson(values) : handleCreateLesson(values)
-                    })
-                    .catch(error => {
-                        console.log("Validation Failed: ", error)
-                    })
-            }}
+            footer={modalFooter}
         >
             <Form
                 form={form}

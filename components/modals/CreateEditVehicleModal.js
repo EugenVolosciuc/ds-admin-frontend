@@ -113,7 +113,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 </Col>
             }
             <Col span={12}>
-                <Button onClick={() => onCancel()}>Cancel</Button>
+                <Button onClick={() => onCancel()}>Close</Button>
                 <Button
                     onClick={() => form.validateFields().then(values => isUpdateModal ? handleUpdateVehicle(values) : handleCreateVehicle(values))}
                     loading={isLoading === 'register' || isLoading === 'update'}

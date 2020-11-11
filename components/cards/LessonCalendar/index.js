@@ -8,7 +8,7 @@ import fetcher from 'utils/functions/fetcher'
 import CreateEditLessonModal from 'components/modals/CreateEditLessonModal'
 import USER_ROLES from 'constants/USER_ROLES'
 import { authContext } from 'utils/hoc/withAuth'
-import nameShortener from 'utils/functions/nameShortener'
+import getLessonTitle from 'utils/functions/getLessonTitle'
 
 const localizer = momentLocalizer(moment)
 
@@ -31,7 +31,7 @@ const LessonCalendar = ({ location }) => {
             location: location?._id
         }
     }))
-    
+
     const toggleCreateLessonModal = () => setShowCreateLessonModal(!showCreateLessonModal)
 
     const toggleUpdateLessonModal = id => {
@@ -87,25 +87,12 @@ const LessonCalendar = ({ location }) => {
         }
     }
 
-    const getLessonTitle = lesson => {
-        const { instructor, student, location, vehicle } = lesson
 
-        switch (user.role) {
-            case USER_ROLES.SCHOOL_ADMIN.tag:
-                return `${nameShortener(student.lastName, student.firstName)} with ${nameShortener(instructor.lastName, instructor.firstName)} at ${location.name} - ${vehicle.brand} ${vehicle.model}`
-            case USER_ROLES.LOCATION_ADMIN.tag:
-                return `${nameShortener(student.lastName, student.firstName)} with ${nameShortener(instructor.lastName, instructor.firstName)} - ${vehicle.brand} ${vehicle.model}`
-            case USER_ROLES.INSTRUCTOR.tag:
-                return `${nameShortener(student.lastName, student.firstName)} - ${vehicle.brand} ${vehicle.model}`
-            case USER_ROLES.STUDENT.tag:
-                return `${nameShortener(instructor.lastName, instructor.firstName)} - ${vehicle.brand} ${vehicle.model}`
-        }
-    }
 
     const getEventsForCalendar = () => {
         if (data) {
             return data.map(lesson => ({
-                title: getLessonTitle(lesson),
+                title: getLessonTitle(lesson, user.role),
                 start: new Date(lesson.start),
                 end: new Date(lesson.end),
                 resource: lesson._id
