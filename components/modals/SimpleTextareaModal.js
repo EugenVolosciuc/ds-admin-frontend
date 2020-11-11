@@ -6,6 +6,7 @@ const SimpleTextareaModal = ({ visible, onCancel, title = null, okBtnTitle, onOk
 
     return (
         <Modal
+            destroyOnClose
             title={<span className="bold">{title}</span>}
             visible={visible}
             onCancel={onCancel}
@@ -14,7 +15,7 @@ const SimpleTextareaModal = ({ visible, onCancel, title = null, okBtnTitle, onOk
             onOk={() => onOk(value)}
         >
             {text && <Typography.Text>{text}</Typography.Text>}
-            <Input.TextArea value={value} onChange={setValue} style={text ? { marginTop: 8 } : {}} />
+            <Input.TextArea value={value} onChange={event => setValue(event.target.value)} style={text ? { marginTop: 8 } : {}} />
         </Modal>
     )
 }
