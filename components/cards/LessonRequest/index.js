@@ -3,7 +3,6 @@ import { Row, Col, Typography, message } from 'antd'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import axios from 'axios'
-import isEmpty from 'lodash/isEmpty'
 
 import getLessonTitle from 'utils/functions/getLessonTitle'
 import { authContext } from 'utils/hoc/withAuth'

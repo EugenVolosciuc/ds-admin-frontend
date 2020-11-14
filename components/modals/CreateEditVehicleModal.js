@@ -13,9 +13,12 @@ import handleLocationSearch from 'utils/functions/searches/handleLocationSearch'
 import handleInstructorSearch from 'utils/functions/searches/handleInstructorSearch'
 import handleSelectInstructor from 'utils/functions/selectors/handleSelectInstructor'
 import handleSelectLocation from 'utils/functions/selectors/handleSelectLocation'
+import OutOfUsePeriodModal from 'components/modals/OutOfUsePeriodModal'
+import errorHandler from 'utils/functions/errorHandler'
 
 const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
     const [isLoading, setIsLoading] = useState(false)
+    const [showOutOfUsePeriodModal, setShowOutOfUsePeriodModal] = useState(false)
     const [locationOptions, setLocationOptions] = useState({ locationNames: [], locationNamesandIDs: [] })
     const [instructorOptions, setInstructorOptions] = useState({ instructorNames: [], instructorNamesandIDs: [] })
 
@@ -26,6 +29,8 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
 
     const isUpdateModal = !!vehicle
     const singleLocation = school?.locations?.length === 1
+
+    const toggleOutOfUsePeriodModal = () => setShowOutOfUsePeriodModal(!showOutOfUsePeriodModal)
 
     const getDataToSend = values => {
         const { brand, category, instructorID, licensePlate, locationID, model, modelYear, transmission } = values
@@ -52,7 +57,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             await mutate('/vehicles', data => ({ ...data, values }), true) // TODO: not working!
         } catch (error) {
             setIsLoading(false)
-            console.log("Error registering vehicle", error)
+            errorHandler(error, form)
         }
     }
 
@@ -70,16 +75,20 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
         }
     }
 
-    const handleOutOfUseVehicle = async () => {
-        setIsLoading('out of use')
+    const handleSetVehicleUsage = async (usage, period) => {
+        setIsLoading('usage')
         try {
-            await axios.patch(`/vehicles/${vehicle._id}`, { status: VEHICLE_STATUSES.INOPERATIVE.tag })
+            await axios.patch(`/vehicles/${vehicle._id}/usage`, {
+                status: usage ? VEHICLE_STATUSES.IDLE.tag : VEHICLE_STATUSES.INOPERATIVE.tag,
+                ...(period && { start: period[0].format('YYYY-MM-DD HH') }),
+                ...(period && { end: period[1].format('YYYY-MM-DD HH') })
+            })
             setIsLoading(false)
             onCancel()
-            message.success('Vehicle set out of use')
+            message.success(`Vehicle set ${usage ? 'back into use' : 'out of use'}`)
         } catch (error) {
             setIsLoading(false)
-            console.log("Error modifying vehicle", error)
+            errorHandler(error, form)
         }
     }
 
@@ -102,17 +111,35 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
 
     const modalTitle = isUpdateModal ? 'Update vehicle' : 'Register vehicle'
     const canPutOutOfUse = isUpdateModal && vehicle.status !== VEHICLE_STATUSES.INOPERATIVE.tag
+    const canPutBackIntoUse = isUpdateModal && vehicle.status === VEHICLE_STATUSES.INOPERATIVE.tag
+
     const modalFooter = (
         <Row justify={canPutOutOfUse ? "space-between" : "end"}>
             {canPutOutOfUse &&
                 <Col span={12}>
                     <Row align="middle" justify="start">
-                        <Popconfirm title="Are you sure you want to put this vehicle out of use?" onConfirm={handleOutOfUseVehicle} okButtonProps={{ danger: true }}>
-                            <Button danger loading={isLoading === 'out of use'}>Out of use</Button>
+                        <Popconfirm
+                            title="Are you sure you want to put this vehicle out of use? This will NOT delete the vehicle."
+                            onConfirm={toggleOutOfUsePeriodModal}
+                            okButtonProps={{ danger: true }}
+                        >
+                            <Button danger loading={isLoading === 'usage'}>Out of use</Button>
                         </Popconfirm>
                         <Tooltip title="Out of use vehicles will not be selectable for further lessons, the lessons that are already scheduled will be canceled.">
                             <InfoCircleOutlined style={{ marginLeft: 8 }} />
                         </Tooltip>
+                    </Row>
+                </Col>
+            }
+            {canPutBackIntoUse &&
+                <Col span={12}>
+                    <Row align="middle" justify="start">
+                        <Popconfirm
+                            title="Are you sure you want to put this vehicle back into use?"
+                            onConfirm={() => handleSetVehicleUsage(true)}
+                        >
+                            <Button loading={isLoading === 'usage'}>Back into use</Button>
+                        </Popconfirm>
                     </Row>
                 </Col>
             }
@@ -137,6 +164,14 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
             onCancel={() => onCancel()}
             footer={modalFooter}
         >
+            <OutOfUsePeriodModal
+                visible={showOutOfUsePeriodModal}
+                onCancel={toggleOutOfUsePeriodModal}
+                title="Set out of use period"
+                okBtn="Set out of use"
+                onOk={period => handleSetVehicleUsage(false, period)}
+                text="Set the period during which the car will be unavailable. All the lessons in this period will be canceled. If not sure, you can set it for an undefined period of time, cancelling all future lessons with this car."
+            />
             <Form
                 form={form}
                 layout="vertical"

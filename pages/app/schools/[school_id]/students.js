@@ -26,7 +26,7 @@ const StudentsPage = () => {
     const userIsInstructor = user.role === USER_ROLES.INSTRUCTOR.tag
     const url = '/users'
 
-    const { data, error, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
+    const { data, isValidating, mutate } = useSWR([url, page, perPage, sortBy], () => fetcher(url, {
         filters: {
             school: user.school._id,
             role: USER_ROLES.STUDENT.tag,
@@ -93,7 +93,13 @@ const StudentsPage = () => {
             key: 'phoneNumber',
             sorter: true
         },
-        // TODO: add location
+        {
+            title: 'Location',
+            dataIndex: 'location',
+            key: 'location',
+            sorter: true,
+            render: location => <span>{location ? location.name : '-'}</span>
+        },
         {
             title: 'Role',
             dataIndex: 'role',
