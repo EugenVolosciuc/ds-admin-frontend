@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react'
-import { Card, List, Empty } from 'antd'
+import { Card, List, Empty, Checkbox } from 'antd'
 import useSWR from 'swr'
 
 import isEmpty from 'lodash/isEmpty'
@@ -12,18 +12,18 @@ const PER_PAGE = 5
 
 const LessonRequestsList = ({ location }) => {
     const [page, setPage] = useState(1)
-    const [sortBy, setSortBy] = useState({})
+    const [filterRejected, setFilterRejected] = useState(false)
 
     const { user } = useContext(authContext)
 
     const url = '/lesson-requests'
 
-    const { data, error, isValidating } = useSWR([url, page, PER_PAGE, sortBy, location], () => fetcher(url, {
+    const { data, isValidating } = useSWR([url, page, PER_PAGE, location, filterRejected], () => fetcher(url, {
         filters: {
             location: location?._id,
+            rejectionReason: filterRejected,
             ...(user.role === USER_ROLES.INSTRUCTOR.tag && { instructor: user._id })
         },
-        sortBy,
         page,
         perPage: PER_PAGE
     }))
@@ -50,8 +50,12 @@ const LessonRequestsList = ({ location }) => {
         </List>
     )
 
+    const extra = (
+        <Checkbox onChange={event => setFilterRejected(event.target.checked)}>Filter rejected</Checkbox>
+    )
+
     return (
-        <Card title={<span className="bold">Lesson requests</span>}>
+        <Card title={<span className="bold">Lesson requests</span>} extra={extra}>
             {isEmpty(data?.lessonrequests) && !isValidating
                 ? <Empty description="No lesson requests" />
                 : lessonRequestCards

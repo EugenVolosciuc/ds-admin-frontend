@@ -3,6 +3,7 @@ import { Row, Col, Typography, message } from 'antd'
 import { CloseOutlined, CheckOutlined } from '@ant-design/icons'
 import moment from 'moment'
 import axios from 'axios'
+import isEmpty from 'lodash/isEmpty'
 
 import getLessonTitle from 'utils/functions/getLessonTitle'
 import { authContext } from 'utils/hoc/withAuth'
@@ -16,13 +17,13 @@ const LessonRequest = ({ lesson }) => {
 
     const { user } = useContext(authContext)
 
-    const isRejected = !!lesson.rejectionReason
+    const isRejected = 'rejectionReason' in lesson
 
     const handleLessonRequestReview = async (action, rejectionReason) => {
         try {
             await axios.post(`/lesson-requests/${lesson._id}/review`, {
                 action,
-                ...(rejectionReason && { rejectionReason })
+                rejectionReason: rejectionReason ? rejectionReason : ''
             })
 
             message.success(`Lesson request ${action === 'accept' ? 'accepted' : 'rejected'}`)
@@ -59,7 +60,7 @@ const LessonRequest = ({ lesson }) => {
                         <Col><Text delete={isRejected}>{getLessonTitle(lesson, user.role)}</Text></Col>
                     </Row>
                     {isRejected &&
-                        <Row gutter={[0, 8]}><Col>Rejection reason: {lesson.rejectionReason}</Col></Row>
+                        <Row gutter={[0, 8]}><Col>{lesson.rejectionReason ? `Rejection reason: ${lesson.rejectionReason}` : 'No rejection reason mentioned'}</Col></Row>
                     }
                 </Col>
                 {!isRejected &&
