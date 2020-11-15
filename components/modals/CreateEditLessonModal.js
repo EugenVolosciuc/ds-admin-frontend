@@ -145,29 +145,29 @@ const CreateEditLessonModal = ({ visible, onCancel, lesson }) => {
         </Form.Item>
     </>)
 
-const modalFooter = (
-    <Row justify={isUpdateModal ? "space-between" : "end"}>
-        {isUpdateModal &&
-            <Col span={8}>
-                <Row align="middle" justify="start">
-                    <Popconfirm title="Are you sure you want to cancel this lesson?" onConfirm={handleDeleteLesson} okButtonProps={{ danger: true }}>
-                        <Button danger loading={isLoading === 'delete'}>Cancel lesson</Button>
-                    </Popconfirm>
-                </Row>
+    const modalFooter = (
+        <Row justify={isUpdateModal ? "space-between" : "end"}>
+            {isUpdateModal &&
+                <Col span={8}>
+                    <Row align="middle" justify="start">
+                        <Popconfirm title="Are you sure you want to cancel this lesson?" onConfirm={handleDeleteLesson} okButtonProps={{ danger: true }}>
+                            <Button danger loading={isLoading === 'delete'}>Cancel lesson</Button>
+                        </Popconfirm>
+                    </Row>
+                </Col>
+            }
+            <Col span={16}>
+                <Button onClick={() => onCancel()}>Close</Button>
+                <Button
+                    onClick={() => form.validateFields().then(values => isUpdateModal ? handleUpdateLesson(values) : handleCreateLesson(values))}
+                    loading={isLoading === 'update' || isLoading === 'create'}
+                    type="primary"
+                >
+                    {modalTitle}
+                </Button>
             </Col>
-        }
-        <Col span={16}>
-            <Button onClick={() => onCancel()}>Close</Button>
-            <Button
-                onClick={() => form.validateFields().then(values => isUpdateModal ? handleUpdateLesson(values) : handleCreateLesson(values))}
-                loading={isLoading === 'update' || isLoading === 'create'}
-                type="primary"
-            >
-                {modalTitle}
-            </Button>
-        </Col>
-    </Row>
-)
+        </Row>
+    )
 
     return (
         <Modal

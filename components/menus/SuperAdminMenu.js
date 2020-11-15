@@ -4,7 +4,8 @@ import {
     DashboardOutlined,
     UserOutlined,
     HomeOutlined,
-    DollarCircleOutlined
+    DollarCircleOutlined,
+    FieldTimeOutlined
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 
@@ -23,6 +24,9 @@ const SuperAdminMenu = () => {
             </Menu.Item>
             <Menu.Item key="/app/admin/schools" icon={<HomeOutlined />}>
                 <Link href="/app/admin/schools" as="/app/admin/schools"><a>Schools</a></Link>
+            </Menu.Item>
+            <Menu.Item key="/app/admin/system/cron" icon={<FieldTimeOutlined />}>
+                <Link href="/app/admin/system/cron" as="/app/admin/system/cron"><a>Cron jobs</a></Link>
             </Menu.Item>
             <Menu.Item key="/app/admin/finances" icon={<DollarCircleOutlined />}>
                 <Link href="/app/admin/finances" as="/app/admin/finances"><a>Finances</a></Link>

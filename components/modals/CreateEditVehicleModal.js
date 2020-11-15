@@ -119,7 +119,7 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
                 <Col span={12}>
                     <Row align="middle" justify="start">
                         <Popconfirm
-                            title="Are you sure you want to put this vehicle out of use? This will NOT delete the vehicle."
+                            title="Are you sure you want to put this vehicle out of use? This will not delete the vehicle."
                             onConfirm={toggleOutOfUsePeriodModal}
                             okButtonProps={{ danger: true }}
                         >
