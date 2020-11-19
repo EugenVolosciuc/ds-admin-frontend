@@ -30,7 +30,8 @@ const OutOfUsePeriodModal = ({ visible, onCancel, title = null, okBtnTitle, onOk
                     <DatePicker.RangePicker
                         showTime
                         className="w-full"
-                        format="YYYY-MM-DD HH"
+                        format="YYYY-MM-DD HH:mm"
+                        minuteStep={10}
                         disabled={undefinedPeriod}
                     />
                 </Form.Item>

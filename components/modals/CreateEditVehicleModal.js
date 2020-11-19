@@ -80,8 +80,8 @@ const CreateEditVehicleModal = ({ visible, onCancel, vehicle }) => {
         try {
             await axios.patch(`/vehicles/${vehicle._id}/usage`, {
                 status: usage ? VEHICLE_STATUSES.IDLE.tag : VEHICLE_STATUSES.INOPERATIVE.tag,
-                ...(period && { start: period[0].format('YYYY-MM-DD HH') }),
-                ...(period && { end: period[1].format('YYYY-MM-DD HH') })
+                ...(period && { start: period[0].format('YYYY-MM-DD HH:mm') }),
+                ...(period && { end: period[1].format('YYYY-MM-DD HH:mm') })
             })
             setIsLoading(false)
             onCancel()
