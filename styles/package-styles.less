@@ -4,12 +4,14 @@
 @primary: #B26E63;
 @secondary: #2F5E7C;
 @whiteish: #F2EFEB;
+@bezier: cubic-bezier(0.645, 0.045, 0.355, 1);
 
 // Ant Design
 @primary-color: @primary;
 @layout-header-background: @secondary;
 @layout-body-background: @whiteish;
 @menu-dark-submenu-bg: @secondary;
+@border-radius-base: 4px;
 
 .ant-table-thead > tr > th {
     font-weight: 700;
@@ -21,4 +23,21 @@
 
 .text-error {
     color: @error-color;
+}
+
+// Card menu
+.ant-menu.settings-menu {
+    .ant-menu-item {
+        transition: all .1s @bezier;
+
+        &:active {
+            border-left: 2px solid lighten(@primary, 10%);
+            background-color: transparent;
+        }
+    }
+
+    .ant-menu-item-selected {
+        background-color: transparent;
+        border-left: 2px solid @primary;
+    }
 }

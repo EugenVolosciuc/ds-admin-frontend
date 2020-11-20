@@ -6,7 +6,8 @@ import {
     BookOutlined,
     PushpinOutlined,
     CalendarOutlined,
-    CarOutlined
+    CarOutlined,
+    SettingOutlined
 } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 
@@ -43,6 +44,9 @@ const SchoolAdminMenu = () => {
             </Menu.Item>
             <Menu.Item key="/app/schools/[school_id]/calendar" icon={<CalendarOutlined />}>
                 <Link href="/app/schools/[school_id]/calendar" as={`/app/schools/${user.school._id}/calendar`}><a>Calendar</a></Link>
+            </Menu.Item>
+            <Menu.Item key="/app/schools/[school_id]/settings" icon={<SettingOutlined />}>
+                <Link href="/app/schools/[school_id]/settings" as={`/app/schools/${user.school._id}/settings`}><a>School settings</a></Link>
             </Menu.Item>
         </Menu>
     )
