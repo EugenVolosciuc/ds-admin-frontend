@@ -56,7 +56,7 @@ const ExamSettings = () => {
                     examTypes={data}
                 />
             }
-            <Col xs={24} lg={16}>
+            <Col span={24}>
                 <Row justify="space-between" align="middle">
                     <Col>
                         <Typography.Title level={4}>List of exam types</Typography.Title>
@@ -108,23 +108,27 @@ const ExamSettings = () => {
                                         </Col>
                                     </Row>
                                     <Row style={{ marginTop: 8 }}>
-                                        <Col span={11}>
+                                        <Col span={7}>
                                             <Typography.Text strong className="block">Examination</Typography.Text>
                                             <Typography.Text className="block">{EXAMINATION_TYPES[item.examination].label}</Typography.Text>
                                         </Col>
-                                        <Col span={11} offset={2}>
+                                        <Col span={7} offset={2}>
                                             <Typography.Text strong className="block">Exam location</Typography.Text>
                                             <Typography.Text className="block">{EXAM_LOCATIONS[item.examLocation].label}</Typography.Text>
                                         </Col>
+                                        <Col span={7} offset={1}>
+                                            <Typography.Text strong className="block">With instructor</Typography.Text>
+                                            <Typography.Text className="block">{item.withInstructor ? 'Yes' : 'No'}</Typography.Text>
+                                        </Col>
                                     </Row>
                                     <Row style={{ marginTop: 8 }}>
-                                        <Col span={11}>
-                                            <Typography.Text strong className="block">Takes place at a specific time</Typography.Text>
-                                            <Typography.Text className="block">{item.specificTime ? 'Yes' : 'No'}</Typography.Text>
-                                        </Col>
-                                        <Col span={11} offset={2}>
+                                        <Col span={7}>
                                             <Typography.Text strong className="block">Is the final exam</Typography.Text>
                                             <Typography.Text className="block">{item.isFinalExam ? 'Yes' : 'No'}</Typography.Text>
+                                        </Col>
+                                        <Col span={7} offset={2}>
+                                            <Typography.Text strong className="block">Takes place at a specific time</Typography.Text>
+                                            <Typography.Text className="block">{item.specificTime ? 'Yes' : 'No'}</Typography.Text>
                                         </Col>
                                     </Row>
                                 </List.Item>

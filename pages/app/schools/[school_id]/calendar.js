@@ -25,11 +25,19 @@ const CalendarPage = () => {
     }
 
     const pageHeaderExtra = (
-        <Select value={location?._id} onChange={handleSelectLocation} style={{ width: 200 }}>
-            {(school?.locations || []).map(location => (
-                <Select.Option value={location._id} key={location._id}>{location.name}</Select.Option>
-            ))}
-        </Select>
+        <Row align="middle">
+            <Col span={6}>
+                <span className="bold">Locations:</span>
+            </Col>
+            <Col span={18}>
+                <Select value={location?._id} onChange={handleSelectLocation} style={{ width: 200, paddingLeft: 16 }}>
+                    {(school?.locations || []).map(location => (
+                        <Select.Option value={location._id} key={location._id}>{location.name}</Select.Option>
+                    ))}
+                </Select>
+            </Col>
+        </Row>
+
     )
 
     useEffect(() => {
@@ -44,7 +52,7 @@ const CalendarPage = () => {
         <DashboardLayout title="Calendar" pageHeaderExtra={showPageHeaderExtra ? pageHeaderExtra : null}>
             {schoolLoading
                 ? <Row justify="center"><Spin /></Row>
-                : <Row gutter={[8, 8]}>
+                : <Row gutter={[16, 16]}>
                     {/* Lesson requests */}
                     {!isStudent &&
                         <Col xs={24} lg={6}>

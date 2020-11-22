@@ -40,20 +40,22 @@ const CreateEditExamTypeModal = ({ visible, onCancel, examType, examTypes }) => 
             examLocation: examType.examLocation,
             examination: examType.examination,
             specificTime: examType.specificTime,
-            isFinalExam: examType.isFinalExam
+            isFinalExam: examType.isFinalExam,
+            withInstructor: examType.withInstructor
         }
         : {
             specificTime: false,
-            isFinalExam: false
+            isFinalExam: false,
+            withInstructor: false
         }
 
     const handleCreateExamType = async values => {
         setIsLoading('create')
         try {
-            await axios.post('/exam-types', { 
-                ...values, 
-                school: school._id, 
-                isFinalExam: values.isFinalExam || false 
+            await axios.post('/exam-types', {
+                ...values,
+                school: school._id,
+                isFinalExam: values.isFinalExam || false
             })
             setIsLoading(false)
             onCancel()
@@ -67,8 +69,8 @@ const CreateEditExamTypeModal = ({ visible, onCancel, examType, examTypes }) => 
     const handleModifyExamType = async values => {
         setIsLoading('modify')
         try {
-            await axios.patch(`/exam-types/${examType._id}`, { 
-                ...values, 
+            await axios.patch(`/exam-types/${examType._id}`, {
+                ...values,
                 school: school._id,
                 isFinalExam: values.isFinalExam
             })
@@ -140,17 +142,7 @@ const CreateEditExamTypeModal = ({ visible, onCancel, examType, examTypes }) => 
                     </Col>
                 </Row>
                 <Row>
-                    <Col span={11}>
-                        <Form.Item>
-                            <Form.Item name="specificTime" valuePropName="checked" noStyle>
-                                <Checkbox disabled={isUpdateModal && !updatableFields.includes('specificTime')}>Specific time</Checkbox>
-                            </Form.Item>
-                            <Tooltip title="Check if this type of exam can be scheduled at a specific hour or leave it unchecked if the exam time is unknown (e.g. from morning till evening).">
-                                <InfoCircleOutlined style={{ marginLeft: 8 }} />
-                            </Tooltip>
-                        </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
+                    <Col span={8}>
                         <Form.Item>
                             {finalExamIsAlreadySet
                                 ? <Tooltip title="You have already set an exam as final. You can only have one final exam.">
@@ -162,7 +154,27 @@ const CreateEditExamTypeModal = ({ visible, onCancel, examType, examTypes }) => 
                             }
 
                             <Tooltip title="If checked, if the student passes this exam, it means the student graduated driving school. There can only be one final exam.">
-                                <InfoCircleOutlined style={{ marginLeft: 8 }} />
+                                <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                            </Tooltip>
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item>
+                            <Form.Item name="withInstructor" valuePropName="checked" noStyle>
+                                <Checkbox disabled={isUpdateModal && !updatableFields.includes('withInstructor')}>With instructor</Checkbox>
+                            </Form.Item>
+                            <Tooltip title="Check this if an instructor is present at this type of exams.">
+                                <InfoCircleOutlined style={{ marginLeft: 2 }} />
+                            </Tooltip>
+                        </Form.Item>
+                    </Col>
+                    <Col span={7} offset={1}>
+                        <Form.Item>
+                            <Form.Item name="specificTime" valuePropName="checked" noStyle>
+                                <Checkbox disabled={isUpdateModal && !updatableFields.includes('specificTime')}>Specific time</Checkbox>
+                            </Form.Item>
+                            <Tooltip title="Check if this type of exam can be scheduled at a specific hour or leave it unchecked if the exam time is unknown (e.g. from morning till evening).">
+                                <InfoCircleOutlined style={{ marginLeft: 2 }} />
                             </Tooltip>
                         </Form.Item>
                     </Col>
