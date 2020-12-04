@@ -1,50 +1,53 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Card, message, Slider, Row, Col } from 'antd'
+import { Card, message, Row, Col, Checkbox } from 'antd'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import useSWR from 'swr'
+import axios from 'axios'
 
 import fetcher from 'utils/functions/fetcher'
 import CreateEditLessonModal from 'components/modals/CreateEditLessonModal'
+import CreateLessonOrExamModal from 'components/modals/CreateLessonOrExamModal'
 import USER_ROLES from 'constants/USER_ROLES'
 import { authContext } from 'utils/hoc/withAuth'
 import getLessonTitle from 'utils/functions/getLessonTitle'
+import CalendarZoomSlider from 'components/cards/LessonCalendar/CalendarZoomSlider'
+import EventTypeSetter from 'components/cards/LessonCalendar/EventTypeSetter'
 
 const localizer = momentLocalizer(moment)
 
 const CALENDAR_STEP = 30
-const MARKS = {
-    1: 'Small',
-    2: 'Medium',
-    3: 'Big'
-}
 
-const ZOOM_LEVELS = {
-    1: 40,
-    2: 60,
-    3: 80
+const eventClasses = {
+    lessons: 'lesson-event',
+    lessonRequests: 'lesson-request-event',
+    exams: 'exam-event',
 }
 
 const LessonCalendar = ({ location }) => {
+    const [eventTypes, setEventTypes] = useState(['lessons'])
     const [showCreateLessonModal, setShowCreateLessonModal] = useState(false) // can be true, false or range
     const [showUpdateLessonModal, setShowUpdateLessonModal] = useState(null)
+    const [showCreateLessonOrExamModal, setShowCreateLessonOrExamModal] = useState(false) // can be true, false or range
     const [calendarRangeStart, setCalendarRangeStart] = useState(moment().toDate())
-    const [zoomLevel, setZoomLevel] = useState(1)
     const [view, setView] = useState('week')
+    const [examTypes, setExamTypes] = useState([])
 
     const { user } = useContext(authContext)
 
-    const url = '/lessons'
+    const url = '/calendar'
 
-    const { data, error, isValidating } = useSWR([url, calendarRangeStart, view, location?._id], () => fetcher(url, {
+    const { data, error, isValidating } = useSWR([url, calendarRangeStart, view, eventTypes, location?._id], () => fetcher(url, {
         filters: {
             startAt: calculateCalendarRange('start'),
             endAt: calculateCalendarRange('end'),
-            location: location?._id
+            location: location?._id,
+            eventTypes
         }
     }))
 
     const toggleCreateLessonModal = () => setShowCreateLessonModal(!showCreateLessonModal)
+    const toggleCreateLessonOrExamModal = () => setShowCreateLessonOrExamModal(!showCreateLessonOrExamModal)
 
     const toggleUpdateLessonModal = id => {
         if (id) return setShowUpdateLessonModal(id)
@@ -53,28 +56,37 @@ const LessonCalendar = ({ location }) => {
     }
 
     const handleSelectSlot = range => {
-        // Only instructors are prohibited to schedule lessons at the same time
+        // Only instructors are prohibited to schedule events at the same time
         if (user.role === USER_ROLES.INSTRUCTOR.tag) {
-            // Only check if lesson exists in selection if the selection > calendar step
+            // Only check if event exists in selection if the selection > calendar step
             const selectionIsBiggerThanCalendarStep = moment.duration(moment(range.end).diff(moment(range.start))).asMinutes() > CALENDAR_STEP
 
             if (selectionIsBiggerThanCalendarStep) {
-                const twoLessonsAtTheSameTime = data.some(lesson => {
-                    if (moment(lesson.start).isSame(range.start, 'day')) {
-                        return moment(lesson.start).isAfter(range.start) && moment(lesson.start).isBefore(range.end)
+                const twoEventsAtTheSameTime = data.some(event => {
+                    if (moment(event.start).isSame(range.start, 'day')) {
+                        return moment(event.start).isAfter(range.start) && moment(event.start).isBefore(range.end)
                     }
 
                     return false
                 })
 
-                if (twoLessonsAtTheSameTime) return message.warn("You can't have two lessons at the same time")
+                if (twoEventsAtTheSameTime) return message.warn("You can't have two events at the same time")
             }
         }
 
-        setShowCreateLessonModal(range)
+        switch (user.role) {
+            case USER_ROLES.SCHOOL_ADMIN.tag:
+            case USER_ROLES.LOCATION_ADMIN.tag:
+            case USER_ROLES.INSTRUCTOR.tag:
+                return setShowCreateLessonOrExamModal(range)
+            case USER_ROLES.STUDENT.tag:
+                return setShowCreateLessonModal(range)
+            default:
+                return
+        }
     }
 
-    const handleSelectEvent = event => setShowUpdateLessonModal(event.resource)
+    const handleSelectEvent = event => setShowUpdateLessonModal(event.resource.id)
     const handleRangeChange = range => setCalendarRangeStart(range[0])
     const handleNavigate = navigatedDate => setCalendarRangeStart(navigatedDate)
     const handleViewChange = newView => setView(newView)
@@ -99,52 +111,55 @@ const LessonCalendar = ({ location }) => {
         }
     }
 
+    const transformAPIResponseToArrayOfEvents = () => {
+        if (data) {
+            const events = Object.entries(data).map(value => {
+                const events = []
+                for (let eventIndex = 0; eventIndex < value[1].length; eventIndex++) {
+                    value[1][eventIndex].type = value[0]
+                    events.push(value[1][eventIndex])
+                }
+
+                return events
+            })
+
+            return events.flat()
+        } else return []
+    }
+
+    const events = transformAPIResponseToArrayOfEvents()
+
     const getEventsForCalendar = () => {
         if (data) {
-            return data.map(lesson => ({
-                title: getLessonTitle(lesson, user.role),
-                start: new Date(lesson.start),
-                end: new Date(lesson.end),
-                resource: lesson._id
+            return events.map(event => ({
+                title: getLessonTitle(event, user.role),
+                start: new Date(event.start),
+                end: new Date(event.end),
+                resource: {
+                    id: event._id,
+                    type: event.type
+                }
             }))
         } else return []
     }
 
-    const changeCalendarCellZoomStyle = value => {
-        const elements = document.querySelectorAll('.rbc-timeslot-group')
-
-        for (let i = 0; i < elements.length; i++) {
-            elements[i].style.minHeight = `${ZOOM_LEVELS[value]}px`
-        }
-    }
-
-    const handleZoomChange = value => {
-        setZoomLevel(value)
-        localStorage.setItem('calendarZoomLevel', value)
-        changeCalendarCellZoomStyle(value)
-    }
-
-    const calendarSlider = <Row align="middle" style={{ maxWidth: 400, marginLeft: 'auto' }}>
-        <Col span={7}>
-            <div className="bold w-full text-right">Zoom level:</div>
-        </Col>
-        <Col span={16} offset={1}>
-            <Slider min={1} max={3} onChange={handleZoomChange} value={zoomLevel} />
-        </Col>
-    </Row>
-
     useEffect(() => {
-        const localStorageZoomLevel = localStorage.getItem('calendarZoomLevel')
-        if (localStorageZoomLevel) {
-            setZoomLevel(localStorageZoomLevel)
-            changeCalendarCellZoomStyle(localStorageZoomLevel)
-        }
+        (async () => {
+            const { data } = await axios.get('/exam-types', {
+                params: {
+                    filters: {
+                        school: user.school._id
+                    }
+                }
+            })
+
+            setExamTypes(data)
+        })()
     }, [])
 
     return (
         <Card
-            title={<span className="bold">Lessons</span>}
-            extra={calendarSlider}
+            title={<span className="bold">Events</span>}
             className="hide-calendar-mode-selector big-extra"
         >
             {/* Create Lesson Modal */}
@@ -157,9 +172,22 @@ const LessonCalendar = ({ location }) => {
                 <CreateEditLessonModal
                     visible={showUpdateLessonModal}
                     onCancel={toggleUpdateLessonModal}
-                    lesson={data?.find(lesson => lesson._id === showUpdateLessonModal)}
+                    lesson={events?.find(event => event._id === showUpdateLessonModal)}
                 />
             }
+
+            {/* Create Lesson or Exam Modal (School admin, Location admin and instructor) */}
+            {showCreateLessonOrExamModal &&
+                <CreateLessonOrExamModal visible={showCreateLessonOrExamModal} onCancel={toggleCreateLessonOrExamModal} examTypes={examTypes} />
+            }
+            <Row align="middle" style={{ paddingBottom: 24 }}>
+                <Col span={12}>
+                    <EventTypeSetter eventTypes={eventTypes} setEventTypes={setEventTypes} />
+                </Col>
+                <Col span={12}>
+                    <CalendarZoomSlider />
+                </Col>
+            </Row>
 
             <Calendar
                 localizer={localizer}
@@ -174,6 +202,7 @@ const LessonCalendar = ({ location }) => {
                 onNavigate={handleNavigate}
                 onView={handleViewChange}
                 onSelectEvent={handleSelectEvent}
+                eventPropGetter={(event) => ({ className: eventClasses[event.resource.type] })}
             />
         </Card>
     )

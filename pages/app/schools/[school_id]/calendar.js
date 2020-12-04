@@ -61,8 +61,6 @@ const CalendarPage = () => {
                     }
                     {/* Calendar */}
                     <Col xs={24} lg={isStudent ? 24 : 18}>
-                        {/* TODO: create a search bar in the top for the school admin, so that he can search for specific locations' lessons calendar. */}
-                        {/* If the school only has one location, don't show the search bar. */}
                         <LessonCalendar location={location} />
                     </Col>
                 </Row>

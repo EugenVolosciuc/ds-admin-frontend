@@ -4,9 +4,10 @@
 @primary: #B26E63;
 @secondary: #2F5E7C;
 @whiteish: #F2EFEB;
+
 @bezier: cubic-bezier(0.645, 0.045, 0.355, 1);
 
-// Ant Design
+// ANT DESIGN
 @primary-color: @primary;
 @layout-header-background: @secondary;
 @layout-body-background: @whiteish;
@@ -47,6 +48,25 @@
     &.big-extra {
         .ant-card-extra {
             flex: 2;
+        }
+    }
+}
+
+// REACT BIG CALENDAR
+.rbc-day-slot {
+    .rbc-event {
+        &.lesson-event {
+            background-color: lighten(@secondary, 10%);
+            border: 1px solid lighten(@secondary, 20%);
+        }
+        
+        &.lesson-request-event {
+            background-color: @highlight-color;
+            border: 1px solid lighten(@highlight-color, 10%);
+        }
+        
+        &.exam-event {
+            background-color: @highlight-color;
         }
     }
 }
