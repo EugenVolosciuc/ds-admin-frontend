@@ -90,6 +90,13 @@ const InstructorsPage = () => {
             key: 'phoneNumber',
             sorter: true
         },
+        {
+            title: 'Location',
+            dataIndex: 'location',
+            key: 'location',
+            sorter: true,
+            render: location => <span>{location ? location.name : '-'}</span>
+        },
         // TODO: add location
         {
             title: 'Created at',

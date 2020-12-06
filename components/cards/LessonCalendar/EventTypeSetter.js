@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Checkbox, Row, Col } from 'antd'
 
 const EventTypeSetter = ({ eventTypes, setEventTypes }) => {
@@ -6,10 +6,23 @@ const EventTypeSetter = ({ eventTypes, setEventTypes }) => {
         if (eventTypes.includes(event.target.value)) {
             const filteredTypes = eventTypes.filter(type => type !== event.target.value)
             setEventTypes(filteredTypes)
+            localStorage.setItem('calendarEventTypes', JSON.stringify(filteredTypes))
         } else {
             setEventTypes([...eventTypes, event.target.value])
+            localStorage.setItem('calendarEventTypes', JSON.stringify([...eventTypes, event.target.value]))
         }
     }
+
+    useEffect(() => {
+        const localStorageCalendarEventTypes = localStorage.getItem('calendarEventTypes')
+        if (localStorageCalendarEventTypes) {
+            try {
+                setEventTypes(JSON.parse(localStorageCalendarEventTypes))
+            } catch (error) {
+                console.error("Error parsing calendar event types from local storage", error)
+            }
+        }
+    }, [])
 
     return (
         <Row>

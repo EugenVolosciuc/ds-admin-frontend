@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react'
-import { Card, message, Row, Col, Checkbox } from 'antd'
+import { Card, message, Row, Col, Spin } from 'antd'
 import { Calendar, momentLocalizer } from 'react-big-calendar'
 import moment from 'moment'
 import useSWR from 'swr'
@@ -13,6 +13,7 @@ import { authContext } from 'utils/hoc/withAuth'
 import getLessonTitle from 'utils/functions/getLessonTitle'
 import CalendarZoomSlider from 'components/cards/LessonCalendar/CalendarZoomSlider'
 import EventTypeSetter from 'components/cards/LessonCalendar/EventTypeSetter'
+import CalendarLegend from 'components/cards/LessonCalendar/CalendarLegend'
 
 const localizer = momentLocalizer(moment)
 
@@ -159,7 +160,11 @@ const LessonCalendar = ({ location }) => {
 
     return (
         <Card
-            title={<span className="bold">Events</span>}
+            title={<>
+                <span className="bold">Events</span>
+                {isValidating && <Spin size="small" style={{ margin: '2px 0 0 8px' }} />}
+            </>}
+            extra={<CalendarLegend />}
             className="hide-calendar-mode-selector big-extra"
         >
             {/* Create Lesson Modal */}
