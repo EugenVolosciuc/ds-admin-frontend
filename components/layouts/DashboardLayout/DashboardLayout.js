@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Layout, Menu, Dropdown, PageHeader } from 'antd'
 import {
     MenuUnfoldOutlined,
@@ -20,7 +20,18 @@ const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
 
     const { user, logout } = useContext(authContext)
 
-    const toggleSider = () => setSiderIsCollapsed(!siderIsCollapsed)
+    const toggleSider = value => {
+        setSiderIsCollapsed(value)
+        setSiderIsCollapsed(!siderIsCollapsed)
+        localStorage.setItem('toggleSider', value)
+    }
+
+    useEffect(() => {
+        const localstorageToggleSider = localStorage.getItem('toggleSider')
+        if(localstorageToggleSider) {
+            setSiderIsCollapsed(localstorageToggleSider)
+        }
+    }, [])
 
     const menu = (
         <Menu triggerSubMenuAction="click">
