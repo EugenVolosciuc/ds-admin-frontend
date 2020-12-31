@@ -16,22 +16,25 @@ import MainMenu from 'components/menus/MainMenu'
 const { Header, Sider, Content } = Layout
 
 const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
+
     const [siderIsCollapsed, setSiderIsCollapsed] = useState(false)
 
     const { user, logout } = useContext(authContext)
 
-    const toggleSider = value => {
-        setSiderIsCollapsed(value)
-        setSiderIsCollapsed(!siderIsCollapsed)
-        localStorage.setItem('toggleSider', value)
-    }
+    const toggleSider = () => setSiderIsCollapsed(!siderIsCollapsed)
+
+    //here is enter in to a infinite loop
+
+    // useEffect(() => {
+    //     const data = localStorage.getItem('toogleSider')
+    //     if (data) {
+    //         setSiderIsCollapsed(JSON.parse(data)) 
+    //     }
+    // })
 
     useEffect(() => {
-        const localstorageToggleSider = localStorage.getItem('toggleSider')
-        if(localstorageToggleSider) {
-            setSiderIsCollapsed(localstorageToggleSider)
-        }
-    }, [])
+        localStorage.setItem('toogleSider', JSON.stringify(siderIsCollapsed))
+    })
 
     const menu = (
         <Menu triggerSubMenuAction="click">
