@@ -23,14 +23,18 @@ const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
 
     const toggleSider = () => setSiderIsCollapsed(!siderIsCollapsed)
 
-    //here is enter in to a infinite loop
+    useEffect(() => {
+        const abortController = new AbortController() // to stop the infinite loop
+        const data = localStorage.getItem('toogleSider')
 
-    // useEffect(() => {
-    //     const data = localStorage.getItem('toogleSider')
-    //     if (data) {
-    //         setSiderIsCollapsed(JSON.parse(data)) 
-    //     }
-    // })
+        console.log(data)
+        if (data) {
+            setSiderIsCollapsed(JSON.parse(data)) 
+        }
+        return function cancel() {
+            abortController.abort();
+        }
+    }, [setSiderIsCollapsed])
 
     useEffect(() => {
         localStorage.setItem('toogleSider', JSON.stringify(siderIsCollapsed))
