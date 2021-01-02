@@ -27,7 +27,6 @@ const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
         const abortController = new AbortController() // to stop the infinite loop
         const data = localStorage.getItem('toogleSider')
 
-        console.log(data)
         if (data) {
             setSiderIsCollapsed(JSON.parse(data)) 
         }
