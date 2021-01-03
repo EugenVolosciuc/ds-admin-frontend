@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Layout, Menu, Dropdown, PageHeader } from 'antd'
 import {
     MenuUnfoldOutlined,
@@ -16,11 +16,28 @@ import MainMenu from 'components/menus/MainMenu'
 const { Header, Sider, Content } = Layout
 
 const DashboardLayout = ({ children, title, pageHeaderExtra }) => {
+
     const [siderIsCollapsed, setSiderIsCollapsed] = useState(false)
 
     const { user, logout } = useContext(authContext)
 
     const toggleSider = () => setSiderIsCollapsed(!siderIsCollapsed)
+
+    useEffect(() => {
+        const abortController = new AbortController() // to stop the infinite loop
+        const data = localStorage.getItem('toogleSider')
+
+        if (data) {
+            setSiderIsCollapsed(JSON.parse(data)) 
+        }
+        return function cancel() {
+            abortController.abort();
+        }
+    }, [setSiderIsCollapsed])
+
+    useEffect(() => {
+        localStorage.setItem('toogleSider', JSON.stringify(siderIsCollapsed))
+    })
 
     const menu = (
         <Menu triggerSubMenuAction="click">
